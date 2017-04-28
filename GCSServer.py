@@ -2,20 +2,32 @@
 GCS Server for VIP project
 
 Yoonpyo Koo (ypkoo@lanada.kaist.ac.kr)
+
+Reference
+Eli Bendersky's code sample (http://eli.thegreenplace.net/2011/05/18/code-sample-socket-client-thread-in-python/)
 """
 
 import socket, struct, threading, Queue
 
 class Command(object):
-
-	SEND, RECEIVE, GET_INFO, CLOSE = range(4)
+	"""
+	A command to a client thread. 
+	"""
+	SEND, GET_INFO, CLOSE = range(3)
 
 	def __init__(self, type, data=None):
 		self.type = type
 		self.data = data
 
 class Reply(object):
+	"""
+	A reply from a client thread. Each type has its associated data:
 
+	ERROR:
+		The error string
+	SUCCESS:
+		The received message
+	"""
 	ERROR, SUCCESS = range(2)
 
 	def __init__(self, type, data=None):
@@ -64,7 +76,6 @@ class DroneClientThread(threading.Thread):
 
 		self.handlers = {
 			Command.SEND: self._handle_SEND,
-			Command.RECEIVE: self._handle_RECEIVE,
 			Command.GET_INFO: self._handle_GET_INFO,
 			Command.CLOSE: self._handle_CLOSE,
 		}
@@ -81,9 +92,6 @@ class DroneClientThread(threading.Thread):
 
 
 	def _handle_SEND(self):
-		pass
-
-	def _handle_RECEIVE(self):
 		pass
 
 	def _handle_GET_INFO(self):
@@ -104,6 +112,16 @@ class DroneClientThread(threading.Thread):
 
 
 class GCSSeverThread(threading.Thread):
+	"""
+	GCS server thread. A GUI can communicate with a client thread
+	by queuing and dequeuing queues in droneClientList.
+
+	Sending a msg to a client:
+		droneClientList[id].cmd_q.put(msg)
+	Receiving a msg from a client:
+		droneClientList[id].reply_q.get()
+	"""
+
 
 	def __init__(self, host, port):
 		super(GCSSeverThread, self).__init__()
@@ -117,14 +135,15 @@ class GCSSeverThread(threading.Thread):
 			connection, address = self.socket.accept()
 			print 'Server connected by', address
 
-			create_client(connection)
+			_create_client(connection)
 
 
-	def create_client(self, connection):
+	def _create_client(self, connection):
 		client = DroneClientThread()
 		self.droneClientList.append(client)
 
 		client.start()
+
 
 
 
