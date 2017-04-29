@@ -1,0 +1,16 @@
+QWidget
+{
+  background-color: rgb(80,80,80);
+  color: rgb(220,220,220);
+  font-size: 20px;
+  outline: none;
+}
+
+/**** QPushButton (enabled) ****/
+QPushButton
+{
+
+  border: none;
+  color: rgb(230,230,230);
+  padding: 4px 8px;
+}
