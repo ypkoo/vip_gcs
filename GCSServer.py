@@ -98,7 +98,7 @@ class DroneClientThread(threading.Thread):
 		try:
 			info = self.drone.get_info()
 			self.reply_q.put(self._success_reply(info))
-		except Error as e:
+		except Exception, e:
 			self.reply_q.put(self._error_reply(str(e)))
 
 
