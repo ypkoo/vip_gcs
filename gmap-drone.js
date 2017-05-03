@@ -18,11 +18,15 @@ function struct_drone() {
 	var infoWindow = '';
 }
 
+
+
 function initMap() {
 	map = new google.maps.Map(document.getElementById('map'), {
 		center: startLatLng,
-		zoom: 19,
-		mapTypeId: google.maps.MapTypeId.HYBRID
+		zoom: 17,
+		// mapTypeId: google.maps.MapTypeId.HYBRID,
+		mapTypeId: google.maps.MapTypeId.SATELLITE,
+		disableDefaultUI: true,
 	});
 
 	// var image = 'images/drone.png';

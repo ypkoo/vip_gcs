@@ -10,7 +10,10 @@ QWidget
 QPushButton
 {
 
-  border: none;
+  border-color: rgb(255,255,255);
+  border-radius: 75px;
   color: rgb(230,230,230);
+  background-color:rgba(0, 0, 0, 1);
   padding: 4px 8px;
+  border: 3px solid rgb(255,255,255);
 }
