@@ -35,104 +35,60 @@ class HoverQWidget(QWidget):
 		self.setStyleSheet("background-color:yellow;")
 		print("Leave")
 
-class MainFrame(QTabWidget):
-
+class MainFrame(QWidget):
 
 	def __init__(self):
 		super(MainFrame, self).__init__()
 
+		self.navBar = QVBoxLayout()
+		self.stackedLayout = QStackedLayout()
+
+		self.mapBtn = QPushButton()
+		self.mapBtn.setIcon(QIcon('image/navi_white.png'))
+		self.mapBtn.setIconSize(QSize(130,130))
+		self.streamingBtn = QPushButton()
+		self.streamingBtn.setIcon(QIcon('image/video_white.png'))
+		self.streamingBtn.setIconSize(QSize(130,130))
+		self.navBar.addWidget(self.mapBtn)
+		self.navBar.addWidget(self.streamingBtn)
 		
+
+		self.streamingBtn.clicked.connect(self.on_streaming_clicked)
+		self.mapBtn.clicked.connect(self.on_map_clicked)
+
+		self.navBar.addWidget(self.mapBtn)
+		self.navBar.addWidget(self.streamingBtn)
+
 		
-		self.setTabBar(VipTabBarWidget(width=100,height=25))
-
-		self.tab1 = QWidget()
-		self.tab2 = QWidget()
-
-		self.addTab(self.tab1, "")
-		self.addTab(self.tab2, "")
-		self.setTabIcon(0, QIcon('image/navi_white_rotated.png'))
-		self.setTabIcon(1, QIcon('image/video_white_rotated.png'))
-		self.setIconSize(QSize(100,100))
-
-		self.setTabPosition(QTabWidget.West)
-
-
-		self.tab1UI()
-		self.tab2UI()
-
-		self.resize(2280, 1520)
-
-
-
-
-	def tab1UI(self):
-
 
 		self.gmap = GMapWebView()
-		self.cmdLayout = QHBoxLayout()
-		self.takeoffBtn = QPushButton("")
-		self.takeoffBtn.setIcon(QIcon('image/takoff.png'))
-		self.takeoffBtn.setIconSize(QSize(130,130))
-		self.targetBtn = QPushButton("")
-		self.targetBtn.setIcon(QIcon('image/target.png'))
-		self.targetBtn.setIconSize(QSize(130,130))
-		# self.btn.setWindowFlags(Qt.FramelessWindowHint)
-		# self.btn.setAttribute(Qt.WA_TranslucentBackground)
+		self.stackedLayout.addWidget(self.gmap)
 
-		self.logText = QTextEdit()
-		self.logText.setReadOnly(True)
-
-		""" Transparent """
-		# self.logText.setWindowFlags(Qt.FramelessWindowHint)
-		# self.logText.setAttribute(Qt.WA_TranslucentBackground)
-		self.logText.setText("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-		self.logText.setStyleSheet("""
+		self.streaming = QWidget()
+		self.streaming.setStyleSheet("""
 			background-color:rgba(0, 0, 0, 50%);
 			border-color: rgb(255,255,255);
 			border: 3px solid rgb(255,255,255);""")
+		self.stackedLayout.addWidget(self.streaming)
 
-		self.cmdLayout.addWidget(self.targetBtn)
-		self.cmdLayout.addWidget(self.takeoffBtn)
+		self.gridLayout = QGridLayout()
+		self.gridLayout.addLayout(self.stackedLayout, 0, 0, 10, 10)
+		self.gridLayout.addLayout(self.navBar, 0, 0, 10, 1)
 
-
-		self.grid = QGridLayout()
+		self.setLayout(self.gridLayout)
 		
-		# self.grid.addWidget(self.gmap, 0, 1, 1, 10)
-		# self.grid.addWidget(self.logText, 1, 1, 1, 10)
-		# self.grid.addWidget(self.btn, 0, 1, 1, 1)
 
-		self.grid.addWidget(self.gmap, 0, 0, 12, 3)
-		self.grid.addWidget(self.logText, 10, 2, 2, 1)
-		# self.grid.addWidget(self.btn, 0, 0, 1, 1)
-		# self.grid.addWidget(self.takeoffBtn, 10, 0, 1, 1)
-		# self.grid.addWidget(self.targetBtn, 10, 1, 1, 1)
-		self.grid.addLayout(self.cmdLayout, 10, 0, 1, 1)
-		
-		self.grid.setColumnStretch(0, 1)
-		self.grid.setColumnStretch(1, 6)
-		self.grid.setColumnStretch(2, 4)
+	def on_map_clicked(self):
+		print "clicked"
+		self.stackedLayout.setCurrentIndex(0)
+		self.navBar.raise_()
+		# self.stackedLayout.setCurrentWidget(self.gmap)
 
-		# self.grid.setRowStretch(0, 10)
-		# self.grid.setRowStretch(1, 20)
-
-		# main_frame = QWidget()
-		self.cmdLayout.setAlignment(Qt.AlignTop)
-		self.tab1.setLayout(self.grid)
-
-		# self.setCentralWidget(main_frame)
-	
-
-	def tab2UI(self):
-		layout = QFormLayout()
-		sex = QHBoxLayout()
-		sex.addWidget(QRadioButton("Male"))
-		sex.addWidget(QRadioButton("Female"))
-		layout.addRow(QLabel("Sex"),sex)
-		layout.addRow("Date of Birth",QLineEdit())
-		# self.setTabText(1,"Personal Details")
-
-		self.tab2.setLayout(layout)
-
+	def on_streaming_clicked(self):
+		print "clicked"
+		self.stackedLayout.setCurrentIndex(1)
+		self.navBar.raise_()
+		# self.stackedLayout.setCurrentWidget(self.streaming)
 
 
 
