@@ -44,7 +44,7 @@ class MainFrame(QWidget):
 		super(MainFrame, self).__init__()
 
 		self.navBar = QVBoxLayout()
-		self.stackedLayout = QStackedLayout()
+		self.stackedLayout = QStackedWidget()
 
 		# self.mapBtn = QPushButton()
 		# self.mapBtn.setIcon(QIcon('image/navi_white.png'))
@@ -78,9 +78,37 @@ class MainFrame(QWidget):
 		# 	background-color:rgba(0, 0, 0, 50%);""")
 
 		
-
+		self.gmapLayout = QGridLayout()
 		self.gmap = GMapWebView()
-		self.stackedLayout.addWidget(self.gmap)
+		self.logText = QTextEdit()
+		self.logText.setReadOnly(True)
+		self.logText.setText("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+		self.logText.setStyleSheet("""
+			background-color:rgba(0, 0, 0, 50%);
+			border-color: rgb(255,255,255);
+			border: 3px solid rgb(255,255,255);""")
+		self.takeoffBtn = QPushButton("")
+		self.takeoffBtn.setIcon(QIcon('image/takoff.png'))
+		self.takeoffBtn.setIconSize(QSize(130,130))
+		self.targetBtn = QPushButton("")
+		self.targetBtn.setIcon(QIcon('image/target.png'))
+		self.targetBtn.setIconSize(QSize(130,130))
+
+		self.gmapLayout.addWidget(self.gmap, 0, 0, 2, 5)
+		self.gmapLayout.addWidget(self.logText, 1, 4, 1, 1)
+		self.gmapLayout.addWidget(self.takeoffBtn, 1, 1, 1, 1)
+		self.gmapLayout.addWidget(self.targetBtn, 1, 2, 1, 1)
+
+		self.gmapLayout.setColumnStretch(0, 1)
+		self.gmapLayout.setColumnStretch(1, 1)
+		self.gmapLayout.setColumnStretch(2, 1)
+		self.gmapLayout.setColumnStretch(3, 1)
+		self.gmapLayout.setColumnStretch(4, 2)
+		self.gmapLayout.setRowStretch(0, 3)
+		self.gmapLayout.setRowStretch(1, 1)
+		self.gmapWidget = QWidget()
+		self.gmapWidget.setLayout(self.gmapLayout)
+		self.stackedLayout.addWidget(self.gmapWidget)
 
 		self.streaming = QWidget()
 		self.streaming.setStyleSheet("""
@@ -90,7 +118,7 @@ class MainFrame(QWidget):
 		self.stackedLayout.addWidget(self.streaming)
 
 		self.gridLayout = QGridLayout()
-		self.gridLayout.addLayout(self.stackedLayout, 0, 0, 1, 2)
+		self.gridLayout.addWidget(self.stackedLayout, 0, 0, 1, 2)
 		self.gridLayout.addLayout(self.navBar, 0, 0, 1, 1)
 		self.gridLayout.setColumnStretch(0, 1)
 		self.gridLayout.setColumnStretch(1, 10)
