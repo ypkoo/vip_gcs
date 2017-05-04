@@ -1,9 +1,15 @@
 /* https://css-tricks.com/almanac/properties/b/border-radius/ */
 
+QObject
+{
+	padding: 0;
+  margin: 0;
+}
+
 QWidget
 {
   background-color: black;
-  color: rgb(220,220,220);
+  
   font-size: 20px;
   outline: none;
 }
@@ -11,28 +17,8 @@ QWidget
 /**** QPushButton (enabled) ****/
 QPushButton
 {
-
-  border-color: rgb(255,255,255);
-  border-radius: 75px;
-  color: rgb(230,230,230);
   background-color:rgba(0, 0, 0, 50%);
-  padding: 0px;
-  margin: 0px;
+  padding: 0;
+  margin: 0;
   /*border: 3px solid rgb(255,255,255);*/
-}
-
-
-QTabBar::tab
-{
-
-  border: none;
-  padding: 0px;
-  margin-top: 5px;
-  color: rgb(220,220,220);
-
-}
-
-QTabWidget::pane
-{
-  border: none;
 }

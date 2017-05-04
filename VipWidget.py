@@ -13,6 +13,9 @@ class VipNavBarBtn(QPushButton):
 
 		self.setMouseTracking(True)
 
+		self.setStyleSheet("""
+			background-color: rgba(0, 0, 0, 0%)""")
+
 	def enterEvent(self,event):
 		print("Enter")
 		self.setIcon(self.hover_icon)

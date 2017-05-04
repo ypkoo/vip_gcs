@@ -12,29 +12,14 @@ from aqua.qsshelper import QSSHelper
 
 class GMapWebView(QWebView):
 
-	def __init__(self):
+	def __init__(self, source):
 		super(GMapWebView, self).__init__()
-		file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "gmap-drone.html"))
+		file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), source))
 		local_url = QUrl.fromLocalFile(file_path)
 		self.load(local_url)
 
 		self.frame = self.page().mainFrame()
 
-
-class HoverQWidget(QWidget):
-	def __init__(self):
-		super(HoverQWidget, self).__init__()
-		self.setMouseTracking(True)
-
-	def enterEvent(self,event):
-		print("Enter")
-		self.setStyleSheet("""
-			background-color:#45b545;
-			border-bottom: 5px solid rgb(255,255,255);""")
-
-	def leaveEvent(self,event):
-		self.setStyleSheet("background-color:yellow;")
-		print("Leave")
 
 
 
@@ -57,14 +42,29 @@ class MainFrame(QWidget):
 		self.streamingBtn = VipNavBarBtn(QIcon('image/video_white.png'), QIcon('image/video_hover.png'))
 		self.Btn1 = VipNavBarBtn(QIcon('image/navi_white.png'), QIcon('image/navi_hover.png'))
 		self.Btn2 = VipNavBarBtn(QIcon('image/video_white.png'), QIcon('image/video_hover.png'))
-		self.mapBtn.setIconSize(QSize(130,130))
-		self.streamingBtn.setIconSize(QSize(130,130))
-		self.Btn1.setIconSize(QSize(130,130))
-		self.Btn2.setIconSize(QSize(130,130))
+		self.mapBtn.setIconSize(QSize(110,110))
+		self.streamingBtn.setIconSize(QSize(110,110))
+		self.Btn1.setIconSize(QSize(110,110))
+		self.Btn2.setIconSize(QSize(110,110))
 		self.navBar.addWidget(self.mapBtn)
 		self.navBar.addWidget(self.streamingBtn)
 		self.navBar.addWidget(self.Btn1)
 		self.navBar.addWidget(self.Btn2)
+
+		# self.mapBtn.setWindowFlags(Qt.FramelessWindowHint)
+		# self.mapBtn.setAttribute(Qt.WA_TranslucentBackground)
+
+		""" remove margin and padding """
+		self.navBar.setSpacing(0)
+		self.navBar.setContentsMargins(0,0,0,0)
+
+
+		self.navWidget = QWidget()
+		self.navWidget.setLayout(self.navBar)
+		self.navWidget.setStyleSheet("""
+			background-color:rgba(0, 0, 0, 50%);
+			padding-top: 20px;
+			margin: 0px;""")
 
 		self.navBar.setAlignment(Qt.AlignTop)
 		
@@ -72,21 +72,18 @@ class MainFrame(QWidget):
 		self.streamingBtn.clicked.connect(self.on_streaming_clicked)
 		self.mapBtn.clicked.connect(self.on_map_clicked)
 
-		self.navBar.addWidget(self.mapBtn)
-		self.navBar.addWidget(self.streamingBtn)
-		# self.navBar.setStyleSheet("""
-		# 	background-color:rgba(0, 0, 0, 50%);""")
-
 		
 		self.gmapLayout = QGridLayout()
-		self.gmap = GMapWebView()
+		self.gmap = GMapWebView("gmap-drone.html")
 		self.logText = QTextEdit()
 		self.logText.setReadOnly(True)
 		self.logText.setText("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
 		self.logText.setStyleSheet("""
 			background-color:rgba(0, 0, 0, 50%);
 			border-color: rgb(255,255,255);
-			border: 3px solid rgb(255,255,255);""")
+			color: white;
+			padding: 3px;
+			border: none;""")
 		self.takeoffBtn = QPushButton("")
 		self.takeoffBtn.setIcon(QIcon('image/takoff.png'))
 		self.takeoffBtn.setIconSize(QSize(130,130))
@@ -114,12 +111,12 @@ class MainFrame(QWidget):
 		self.streaming.setStyleSheet("""
 			background-color:rgba(0, 0, 0, 50%);
 			border-color: rgb(255,255,255);
-			border: 3px solid rgb(255,255,255);""")
+			border: none;""")
 		self.stackedLayout.addWidget(self.streaming)
 
 		self.gridLayout = QGridLayout()
 		self.gridLayout.addWidget(self.stackedLayout, 0, 0, 1, 2)
-		self.gridLayout.addLayout(self.navBar, 0, 0, 1, 1)
+		self.gridLayout.addWidget(self.navWidget, 0, 0, 1, 1)
 		self.gridLayout.setColumnStretch(0, 1)
 		self.gridLayout.setColumnStretch(1, 10)
 
