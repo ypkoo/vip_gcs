@@ -4,6 +4,7 @@ from PyQt4.QtWebKit import QWebView, QWebPage
 from PyQt4.QtNetwork import QNetworkAccessManager, QNetworkRequest
 from FingerTabs import *
 from VipTabBar import VipTabBarWidget
+from VipWidget import *
 
 import sys, os
 from aqua.qsshelper import QSSHelper
@@ -35,6 +36,8 @@ class HoverQWidget(QWidget):
 		self.setStyleSheet("background-color:yellow;")
 		print("Leave")
 
+
+
 class MainFrame(QWidget):
 
 	def __init__(self):
@@ -43,14 +46,27 @@ class MainFrame(QWidget):
 		self.navBar = QVBoxLayout()
 		self.stackedLayout = QStackedLayout()
 
-		self.mapBtn = QPushButton()
-		self.mapBtn.setIcon(QIcon('image/navi_white.png'))
+		# self.mapBtn = QPushButton()
+		# self.mapBtn.setIcon(QIcon('image/navi_white.png'))
+		# self.mapBtn.setIconSize(QSize(130,130))
+		# self.streamingBtn = QPushButton()
+		# self.streamingBtn.setIcon(QIcon('image/video_white.png'))
+		# self.streamingBtn.setIconSize(QSize(130,130))
+
+		self.mapBtn = VipNavBarBtn(QIcon('image/navi_white.png'), QIcon('image/navi_hover.png'))
+		self.streamingBtn = VipNavBarBtn(QIcon('image/video_white.png'), QIcon('image/video_hover.png'))
+		self.Btn1 = VipNavBarBtn(QIcon('image/navi_white.png'), QIcon('image/navi_hover.png'))
+		self.Btn2 = VipNavBarBtn(QIcon('image/video_white.png'), QIcon('image/video_hover.png'))
 		self.mapBtn.setIconSize(QSize(130,130))
-		self.streamingBtn = QPushButton()
-		self.streamingBtn.setIcon(QIcon('image/video_white.png'))
 		self.streamingBtn.setIconSize(QSize(130,130))
+		self.Btn1.setIconSize(QSize(130,130))
+		self.Btn2.setIconSize(QSize(130,130))
 		self.navBar.addWidget(self.mapBtn)
 		self.navBar.addWidget(self.streamingBtn)
+		self.navBar.addWidget(self.Btn1)
+		self.navBar.addWidget(self.Btn2)
+
+		self.navBar.setAlignment(Qt.AlignTop)
 		
 
 		self.streamingBtn.clicked.connect(self.on_streaming_clicked)
@@ -58,6 +74,8 @@ class MainFrame(QWidget):
 
 		self.navBar.addWidget(self.mapBtn)
 		self.navBar.addWidget(self.streamingBtn)
+		# self.navBar.setStyleSheet("""
+		# 	background-color:rgba(0, 0, 0, 50%);""")
 
 		
 
@@ -72,22 +90,30 @@ class MainFrame(QWidget):
 		self.stackedLayout.addWidget(self.streaming)
 
 		self.gridLayout = QGridLayout()
-		self.gridLayout.addLayout(self.stackedLayout, 0, 0, 10, 10)
-		self.gridLayout.addLayout(self.navBar, 0, 0, 10, 1)
+		self.gridLayout.addLayout(self.stackedLayout, 0, 0, 1, 2)
+		self.gridLayout.addLayout(self.navBar, 0, 0, 1, 1)
+		self.gridLayout.setColumnStretch(0, 1)
+		self.gridLayout.setColumnStretch(1, 10)
 
 		self.setLayout(self.gridLayout)
+		self.resize(2280, 1520)
 		
 
 	def on_map_clicked(self):
 		print "clicked"
 		self.stackedLayout.setCurrentIndex(0)
-		self.navBar.raise_()
+		self.mapBtn.raise_()
+		self.streamingBtn.raise_()
+		# self.navBar.raise_()
+		# self.stackedLayout.lower()
 		# self.stackedLayout.setCurrentWidget(self.gmap)
 
 	def on_streaming_clicked(self):
 		print "clicked"
 		self.stackedLayout.setCurrentIndex(1)
-		self.navBar.raise_()
+		self.mapBtn.raise_()
+		self.streamingBtn.raise_()
+		# self.stackedLayout.lower()
 		# self.stackedLayout.setCurrentWidget(self.streaming)
 
 
