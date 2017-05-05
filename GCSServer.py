@@ -37,9 +37,9 @@ class Reply(object):
 
 class Drone(object):
 
-	def __init__(self, id):
+	def __init__(self, id_=None):
 
-		self.id = id
+		self.id = id_
 
 		""" Location Info """
 		self.lat = None
@@ -53,11 +53,11 @@ class Drone(object):
 
 	def get_info(self):
 		info = {
-			id: self.drone.id
-			location: (self.drone.lat, self.drone.lng, self.drone.alt)
-			isFlying = self.drone.isFlying
-			isTracking = self.drone.isTracking
-			isLocating = self.drone.isLocating
+			'id': self.drone.id,
+			'location': (self.drone.lat, self.drone.lng, self.drone.alt),
+			'isFlying': self.drone.isFlying,
+			'isTracking': self.drone.isTracking,
+			'isLocating': self.drone.isLocating,
 		}
 
 		return info
@@ -65,14 +65,16 @@ class Drone(object):
 
 class DroneClientThread(threading.Thread):
 
-	def __init__(self, connection, id):
+	def __init__(self, connection, id_):
 		super(DroneClientThread, self).__init__()
 		self.socket = connection
-		self.drone = Drone(id)
+		self.drone = Drone()
 		self.cmd_q = Queue.Queue()
 		self.reply_q = Queue.Queue()
 		self.alive = threading.Event()
 		self.alive.set()
+
+		self._isIdSet = False
 
 		self.handlers = {
 			Command.SEND: self._handle_SEND,
@@ -101,6 +103,9 @@ class DroneClientThread(threading.Thread):
 		except Exception, e:
 			self.reply_q.put(self._error_reply(str(e)))
 
+	def _handle_CLOSE(self):
+		pass
+
 
 	def _error_reply(self, errstr):
 		return Reply(Reply.ERROR, errstr)
@@ -126,7 +131,7 @@ class GCSSeverThread(threading.Thread):
 	def __init__(self, host, port):
 		super(GCSSeverThread, self).__init__()
 		self.droneClientList = []
-		self.socket = socket(AF_INET, SOCK_STREAM)
+		self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.socket.bind((host, port))
 		self.socket.listen(5)
 
@@ -135,15 +140,17 @@ class GCSSeverThread(threading.Thread):
 			connection, address = self.socket.accept()
 			print 'Server connected by', address
 
-			_create_client(connection)
+			self._create_client(connection)
 
 
 	def _create_client(self, connection):
-		client = DroneClientThread()
+		client = DroneClientThread(connection, 1)
 		self.droneClientList.append(client)
 
 		client.start()
 
 
 
-
+if __name__ == "__main__":
+	server = GCSSeverThread("127.0.0.1", 41234)
+	server.start()

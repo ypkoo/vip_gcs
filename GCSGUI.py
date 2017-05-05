@@ -2,8 +2,8 @@ from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 from PyQt4.QtWebKit import QWebView, QWebPage
 from PyQt4.QtNetwork import QNetworkAccessManager, QNetworkRequest
-from VipTabBar import VipTabBarWidget
 from VipWidget import *
+from GCSServer import *
 
 import sys, os
 from aqua.qsshelper import QSSHelper
@@ -64,9 +64,10 @@ class MainFrame(QWidget):
 		self.logText.setText("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
 		self.logText.setStyleSheet("""
 			background-color:rgba(0, 0, 0, 50%);
-			border-color: rgb(255,255,255);
 			color: white;
 			padding: 3px;
+			margin-right: 20px;
+			margin-bottom: 10px;
 			border: none;""")
 		self.takeoffBtn = QPushButton("")
 		self.takeoffBtn.setIcon(QIcon('image/takoff.png'))
@@ -113,26 +114,22 @@ class MainFrame(QWidget):
 		self.stackedLayout.setCurrentIndex(0)
 		self.mapBtn.raise_()
 		self.streamingBtn.raise_()
-		# self.navBar.raise_()
-		# self.stackedLayout.lower()
-		# self.stackedLayout.setCurrentWidget(self.gmap)
+
 
 	def on_streaming_clicked(self):
 		print "clicked"
 		self.stackedLayout.setCurrentIndex(1)
 		self.mapBtn.raise_()
 		self.streamingBtn.raise_()
-		# self.stackedLayout.lower()
-		# self.stackedLayout.setCurrentWidget(self.streaming)
+
+	def create_gcs_server(self):
 
 
 
 
 if __name__ == '__main__':
 	app = QApplication(sys.argv)
-	# qss = QSSHelper.open_qss(os.path.join('aqua', 'aqua.qss'))
 	style = QSSHelper.open_qss('style.qss')
-	# app.setStyleSheet(qss + style)
 	app.setStyleSheet(style)
 	frame = MainFrame()
 	frame.show()
