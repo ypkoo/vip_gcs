@@ -7,7 +7,7 @@ Reference
 Eli Bendersky's code sample (http://eli.thegreenplace.net/2011/05/18/code-sample-socket-client-thread-in-python/)
 """
 
-import socket, struct, threading, Queue
+import socket, struct, threading, Queue, select
 
 class Command(object):
 	"""
@@ -69,8 +69,7 @@ class DroneClientThread(threading.Thread):
 		super(DroneClientThread, self).__init__()
 		self.socket = connection
 		self.drone = Drone()
-		self.cmd_q = Queue.Queue()
-		self.reply_q = Queue.Queue()
+
 		self.alive = threading.Event()
 		self.alive.set()
 

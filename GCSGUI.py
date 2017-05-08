@@ -123,7 +123,7 @@ class MainFrame(QWidget):
 		self.streamingBtn.raise_()
 
 	def create_gcs_server(self):
-
+		pass
 
 
 
