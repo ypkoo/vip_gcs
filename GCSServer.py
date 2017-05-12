@@ -5,9 +5,10 @@ Yoonpyo Koo (ypkoo@lanada.kaist.ac.kr)
 
 Reference
 Eli Bendersky's code sample (http://eli.thegreenplace.net/2011/05/18/code-sample-socket-client-thread-in-python/)
+Pollable Queue http://chimera.labs.oreilly.com/books/1230000000393/ch12.html
 """
 
-import socket, struct, threading, Queue, select
+import socket, struct, threading, Queue, select, json, sys
 
 class Command(object):
 	"""
@@ -34,10 +35,18 @@ class Reply(object):
 		self.type = type
 		self.data = data
 
+class ServerReport(object):
+
+	NEW, TEXT = range(2)
+
+	def __init__(self, type_, data=None):
+		self.type = type_
+		self.data = data
+
 
 class Drone(object):
 
-	def __init__(self, id_=None):
+	def __init__(self, id_):
 
 		self.id = id_
 
@@ -51,13 +60,19 @@ class Drone(object):
 		self.isTracking = None
 		self.isLocating = None
 
+		self.lastUpdate = None
+
+		""" TO DO: reimplement using a queue """
+		self.reportQueue = None 
+
 	def get_info(self):
 		info = {
-			'id': self.drone.id,
-			'location': (self.drone.lat, self.drone.lng, self.drone.alt),
-			'isFlying': self.drone.isFlying,
-			'isTracking': self.drone.isTracking,
-			'isLocating': self.drone.isLocating,
+			'id': self.id,
+			'location': (self.lat, self.lng, self.alt),
+			'isFlying': self.isFlying,
+			'isTracking': self.isTracking,
+			'isLocating': self.isLocating,
+			'lastUpdate': self.lastUpdate,
 		}
 
 		return info
@@ -65,52 +80,37 @@ class Drone(object):
 
 class DroneClientThread(threading.Thread):
 
-	def __init__(self, connection, id_):
+	def __init__(self, connection, id_, q):
 		super(DroneClientThread, self).__init__()
 		self.socket = connection
-		self.drone = Drone()
+		self.q = q
+		self.drone = Drone(id_)
 
 		self.alive = threading.Event()
 		self.alive.set()
 
 		self._isIdSet = False
 
-		self.handlers = {
-			Command.SEND: self._handle_SEND,
-			Command.GET_INFO: self._handle_GET_INFO,
-			Command.CLOSE: self._handle_CLOSE,
-		}
-
-
 
 	def run(self):
 		while self.alive.isSet():
-			try:
-				cmd = self.cmd_q.get(True, 0.1)
-				self.handlers[cmd.type](cmd)
-			except Queue.Empty as e:
-				continue
+			raw_data = self.socket.recv(2048)
+			if raw_data:
+				data = json.loads(raw_data)
+				self._update_drone(data)
 
+	def _update_drone(self, data):
+		if data["type"] == "status":
+			self.drone.lat = data["lat"]
+			self.drone.lng = data["lng"]
+			self.drone.alt = data["alt"]
+			self.drone.lastUpdate = data["lastUpdate"]
+		if data["type"] == "reply":
+			self.drone.reply = data["reply"]
+	
 
-	def _handle_SEND(self):
-		pass
-
-	def _handle_GET_INFO(self):
-		try:
-			info = self.drone.get_info()
-			self.reply_q.put(self._success_reply(info))
-		except Exception, e:
-			self.reply_q.put(self._error_reply(str(e)))
-
-	def _handle_CLOSE(self):
-		pass
-
-
-	def _error_reply(self, errstr):
-		return Reply(Reply.ERROR, errstr)
-
-	def _success_reply(self, data=None):
-		return Reply(Reply.SUCCESS, data)
+	def send(self, msg):
+		self.socket.send(msg)
 
 
 
@@ -129,24 +129,45 @@ class GCSSeverThread(threading.Thread):
 
 	def __init__(self, host, port):
 		super(GCSSeverThread, self).__init__()
-		self.droneClientList = []
-		self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		self.socket.bind((host, port))
-		self.socket.listen(5)
+		self.droneList = []
+		self.serverReportQueue = Queue.Queue()
+		self.clientReportQueue = Queue.Queue()
+
+		try:
+			self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+			self.socket.bind((host, port))
+			self.socket.listen(5)
+			self.serverReportQueue.put(ServerReport(ServerReport.TEXT, "Server is initiated successfully."))
+
+		except socket.error, msg:
+			text = "Couldnt connect with the socket-server: %s\n terminating server" % msg
+			self.serverReportQueue.put(ServerReport(ServerReport.TEXT, text))
+			sys.exit(1)
 
 	def run(self):
 		while True:
 			connection, address = self.socket.accept()
-			print 'Server connected by', address
+			print "connection", connection
+			init_data = json.loads(connection.recv(2048))
+			id_ = str(init_data["id"])
+			text = 'A new drone %s is connected.' % id_
+			print text
+			# report = 
+			self.serverReportQueue.put(ServerReport(ServerReport.NEW, text))
 
-			self._create_client(connection)
+			self._create_client(connection, id_, self.clientReportQueue)
 
 
-	def _create_client(self, connection):
-		client = DroneClientThread(connection, 1)
-		self.droneClientList.append(client)
+	def _create_client(self, connection, id_, q):
+		client = DroneClientThread(connection, id_, q)
+		self.droneList.append(client)
 
 		client.start()
+
+	def send(self, id_, msg):
+		for drone in self.droneList:
+			if drone.drone.id == id_:
+				drone.send(msg)
 
 
 

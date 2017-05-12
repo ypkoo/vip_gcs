@@ -5,7 +5,7 @@ from PyQt4.QtNetwork import QNetworkAccessManager, QNetworkRequest
 from VipWidget import *
 from GCSServer import *
 
-import sys, os
+import sys, os, time, signal
 from aqua.qsshelper import QSSHelper
 
 
@@ -20,13 +20,16 @@ class GMapWebView(QWebView):
 		self.frame = self.page().mainFrame()
 
 
-
-
 class MainFrame(QWidget):
 
 	def __init__(self):
 		super(MainFrame, self).__init__()
 
+		self.frame_init()
+		self.gcs_server_init()
+		
+	
+	def frame_init(self):
 		self.navBar = VipNavBar()
 		self.stackedLayout = QStackedWidget()
 
@@ -46,7 +49,7 @@ class MainFrame(QWidget):
 			icon_default = QIcon('image/video_white.png'),
 			icon_hover = QIcon('image/video_hover.png'),
 			icon_others_hover = QIcon('image/video.png'))
-	
+		
 		self.navBar.add_btn(self.mapBtn)
 		self.navBar.add_btn(self.streamingBtn)
 		self.navBar.add_btn(self.Btn1)
@@ -61,7 +64,7 @@ class MainFrame(QWidget):
 		self.gmap = GMapWebView("gmap-drone.html")
 		self.logText = QTextEdit()
 		self.logText.setReadOnly(True)
-		self.logText.setText("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+		
 		self.logText.setStyleSheet("""
 			background-color:rgba(0, 0, 0, 50%);
 			color: white;
@@ -107,7 +110,6 @@ class MainFrame(QWidget):
 
 		self.setLayout(self.gridLayout)
 		self.resize(2280, 1520)
-		
 
 	def on_map_clicked(self):
 		print "clicked"
@@ -122,15 +124,54 @@ class MainFrame(QWidget):
 		self.mapBtn.raise_()
 		self.streamingBtn.raise_()
 
-	def create_gcs_server(self):
-		pass
+	def gcs_server_init(self):
+		self.logText.append("Connecting to the server...")
+		self.server = GCSSeverThread("127.0.0.1", 43213)
+
+		""" Server timer init """
+		self.server_timer = QTimer(self)
+		self.server_timer.timeout.connect(self.on_server_timer)
+		self.server_timer.start(200)
+
+		self.server.start()
+
+	def on_server_timer(self):
+		try:
+			serverReport = self.server.serverReportQueue.get_nowait()
+			if serverReport.type == ServerReport.TEXT:
+				self.logText.append(serverReport.data)
+			elif serverReport.type == ServerReport.NEW:
+				self.logText.append(serverReport.data)
+		except Queue.Empty as e:
+			pass
+
+		try:
+			clientReport = self.server.clientReportQueue.get_nowait()
+			if serverReport.type == ServerReport.TEXT:
+				self.logText.append(serverReport.data)
+			elif serverReport.type == ServerReport.NEW:
+				self.logText.append(serverReport.data)
+		except Queue.Empty as e:
+			pass
+
+		for drone in self.server.droneList:
+			print drone.drone.get_info()
 
 
 
 if __name__ == '__main__':
+	signal.signal(signal.SIGINT, signal.SIG_DFL)
 	app = QApplication(sys.argv)
 	style = QSSHelper.open_qss('style.qss')
 	app.setStyleSheet(style)
 	frame = MainFrame()
 	frame.show()
+	# try:
+	# 	while True:
+	# 		time.sleep(.1)
+	# except KeyboardInterrupt:
+	# 	print "KeyboardInterrupt"
+	# 	sys.exit(app.exec_())
 	sys.exit(app.exec_())
+
+	
