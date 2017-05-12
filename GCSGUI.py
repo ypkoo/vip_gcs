@@ -52,8 +52,8 @@ class MainFrame(QWidget):
 		
 		self.navBar.add_btn(self.mapBtn)
 		self.navBar.add_btn(self.streamingBtn)
-		self.navBar.add_btn(self.Btn1)
-		self.navBar.add_btn(self.Btn2)
+		# self.navBar.add_btn(self.Btn1)
+		# self.navBar.add_btn(self.Btn2)
 
 		
 		self.streamingBtn.clicked.connect(self.on_streaming_clicked)
@@ -78,6 +78,8 @@ class MainFrame(QWidget):
 		self.targetBtn = QPushButton("")
 		self.targetBtn.setIcon(QIcon('image/target.png'))
 		self.targetBtn.setIconSize(QSize(130,130))
+
+		self.takeoffBtn.clicked.connect(self.on_takeoff_clicked)
 
 		self.gmapLayout.addWidget(self.gmap, 0, 0, 2, 5)
 		self.gmapLayout.addWidget(self.logText, 1, 4, 1, 1)
@@ -110,6 +112,9 @@ class MainFrame(QWidget):
 
 		self.setLayout(self.gridLayout)
 		self.resize(2280, 1520)
+
+	def on_takeoff_clicked(self):
+		self.server.send("1", "take off!")
 
 	def on_map_clicked(self):
 		print "clicked"
@@ -156,6 +161,8 @@ class MainFrame(QWidget):
 
 		for drone in self.server.droneList:
 			print drone.drone.get_info()
+
+
 
 
 
