@@ -24,7 +24,7 @@ function initMap() {
 	//Locations of the GCS
 	gcsMarker = new google.maps.Marker({
 		position: GCSLatLng,
-		icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'
+		icon: 'http://localhost:8000/map-icons/icon-gcs2-home.png'
 	});
 }
 
@@ -50,7 +50,12 @@ function update_marker(id, lat, lng) {
 	else {
 		var marker = new google.maps.Marker({
 			position: {lat: lat, lng: lng},
-			label: id + "a",
+			icon: 'http://localhost:8000/map-icons/icon-gcs2-blue.png',
+			label: {
+			    text: id + '',
+			    color: 'white',
+			    fontSize: '10px'
+			},
 			map: map
 		});
 
@@ -67,7 +72,7 @@ function update_marker(id, lat, lng) {
 			}
 
 			// console.log("marker_click_event " + id + " " + dist);
-			jsCommunicator.emit_signal(("marker_click_event " + id + " " + dist);
+			jsCommunicator.emit_signal("marker_click_event " + id + " " + dist);
 		});
 
 		drone_dict[id] = marker;
