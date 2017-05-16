@@ -10,15 +10,6 @@ Pollable Queue http://chimera.labs.oreilly.com/books/1230000000393/ch12.html
 
 import socket, struct, threading, Queue, select, json, sys
 
-class Command(object):
-	"""
-	A command to a client thread. 
-	"""
-	SEND, GET_INFO, CLOSE = range(3)
-
-	def __init__(self, type, data=None):
-		self.type = type
-		self.data = data
 
 class Reply(object):
 	"""
