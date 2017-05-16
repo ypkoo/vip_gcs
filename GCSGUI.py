@@ -129,6 +129,7 @@ class MainFrame(QWidget):
 		self.mapBtn.raise_()
 		self.streamingBtn.raise_()
 
+
 	def gcs_server_init(self):
 		self.logText.append("Connecting to the server...")
 		self.server = GCSSeverThread("127.0.0.1", 43213)
@@ -161,6 +162,7 @@ class MainFrame(QWidget):
 
 		for drone in self.server.droneList:
 			print drone.drone.get_info()
+
 
 
 
