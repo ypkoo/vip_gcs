@@ -3,12 +3,20 @@ var gcsMarker;
 var drone_dict = {};
 var lineList = [];
 
+// var icons_url = {
+// 	'home': 'http://localhost:8000/map-icons/icon-gcs2-home.png',
+// 	'idle': 'http://localhost:8000/map-icons/icon-gcs2-blue.png',
+// 	'tracking' : 'http://localhost:8000/map-icons/icon-gcs2-green.png',
+// 	'red': 'http://localhost:8000/map-icons/icon-gcs2-red.png',
+// 	'yellow': 'http://localhost:8000/map-icons/icon-gcs2-blue.png'
+// }
+
 var icons_url = {
-	'home': 'http://localhost:8000/map-icons/icon-gcs2-home.png',
-	'idle': 'http://localhost:8000/map-icons/icon-gcs2-blue.png',
-	'tracking' : 'http://localhost:8000/map-icons/icon-gcs2-green.png',
-	'red': 'http://localhost:8000/map-icons/icon-gcs2-red.png',
-	'yellow': 'http://localhost:8000/map-icons/icon-gcs2-blue.png'
+	'home': 'map-icons/icon-gcs2-home.png',
+	'idle': 'map-icons/icon-gcs2-blue.png',
+	'tracking' : 'map-icons/icon-gcs2-green.png',
+	'red': 'map-icons/icon-gcs2-red.png',
+	'yellow': 'map-icons/icon-gcs2-blue.png'
 }
 
 // Initialize the map. Called when this file is loaded.
@@ -48,7 +56,7 @@ function map_clicked(e) {
 // updates the position of the marker
 // creates a new marker if the id is not recognized
 function update_marker(id, lat, lng) {
-
+	console.log("update marker!");
 	if (id in drone_dict) {
 		var marker = drone_dict[id];
 		marker.setPosition({lat: lat, lng: lng});

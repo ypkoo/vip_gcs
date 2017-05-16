@@ -137,7 +137,7 @@ class MainFrame(QWidget):
 		""" Server timer init """
 		self.server_timer = QTimer(self)
 		self.server_timer.timeout.connect(self.on_server_timer)
-		self.server_timer.start(200)
+		self.server_timer.start(1000)
 
 		self.server.start()
 
@@ -146,22 +146,21 @@ class MainFrame(QWidget):
 			serverReport = self.server.serverReportQueue.get_nowait()
 			if serverReport.type == ServerReport.TEXT:
 				self.logText.append(serverReport.data)
+
+				
 			elif serverReport.type == ServerReport.NEW:
 				self.logText.append(serverReport.data)
+			elif serverReport.type == ServerReport.TERMINATE:
+				self.gmap.frame.evaluateJavaScript('remove_marker(%s)' % serverReport.data)
+
 		except Queue.Empty as e:
 			pass
 
-		try:
-			clientReport = self.server.clientReportQueue.get_nowait()
-			if serverReport.type == ServerReport.TEXT:
-				self.logText.append(serverReport.data)
-			elif serverReport.type == ServerReport.NEW:
-				self.logText.append(serverReport.data)
-		except Queue.Empty as e:
-			pass
 
 		for drone in self.server.droneList:
-			print drone.drone.get_info()
+			info = drone.drone.get_info()
+			print info
+			self.gmap.frame.evaluateJavaScript('update_marker(%s, %s, %s)' % (info['id'], info['location']['lat'], info['location']['lng']))
 
 
 

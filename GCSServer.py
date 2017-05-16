@@ -35,18 +35,51 @@ class Reply(object):
 		self.type = type
 		self.data = data
 
-class ServerReport(object):
+class ClientReport(object):
 
-	NEW, TEXT = range(2)
+	NEW, TERMINATE = range(2)
 
 	def __init__(self, type_, data=None):
 		self.type = type_
 		self.data = data
 
+class ServerReport(object):
+
+	NEW, TEXT, TERMINATE = range(3)
+
+	def __init__(self, type_, data=None):
+		self.type = type_
+		self.data = data
+
+class PollableQueue(Queue.Queue, object):
+	def __init__(self):
+		# super(PollableQueue, self).__init__()
+		super(PollableQueue, self).__init__()
+
+		server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		server.bind(('127.0.0.1', 0))
+		server.listen(1)
+		self._putsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		self._putsocket.connect(server.getsockname())
+		self._getsocket, _ = server.accept()
+		server.close()
+
+	def fileno(self):
+		return self._getsocket.fileno()
+
+	def put(self, item):
+		super(PollableQueue, self).put(item)
+		# Queue.Queue.put(item)
+		self._putsocket.send(b'x')
+
+	def get(self):
+		self._getsocket.recv(1)
+		return super(PollableQueue, self).get()
+
 
 class Drone(object):
 
-	def __init__(self, id_):
+	def __init__(self, id_=None):
 
 		self.id = id_
 
@@ -68,7 +101,7 @@ class Drone(object):
 	def get_info(self):
 		info = {
 			'id': self.id,
-			'location': (self.lat, self.lng, self.alt),
+			'location': {'lat': self.lat, 'lng': self.lng, 'alt': self.alt},
 			'isFlying': self.isFlying,
 			'isTracking': self.isTracking,
 			'isLocating': self.isLocating,
@@ -80,37 +113,57 @@ class Drone(object):
 
 class DroneClientThread(threading.Thread):
 
-	def __init__(self, connection, id_, q):
+	def __init__(self, connection, q):
 		super(DroneClientThread, self).__init__()
-		self.socket = connection
-		self.q = q
-		self.drone = Drone(id_)
+		self._socket = connection
+		self._q = q
+		self.drone = None
 
 		self.alive = threading.Event()
 		self.alive.set()
 
-		self._isIdSet = False
+		# self._isIdSet = False
 
 
 	def run(self):
 		while self.alive.isSet():
-			raw_data = self.socket.recv(2048)
+			raw_data = self._socket.recv(2048)
 			if raw_data:
 				data = json.loads(raw_data)
-				self._update_drone(data)
+				if self.drone:
+					
+					self._update_drone(data)
+				else:
+					self.drone = Drone(data["data"]["id"])
+					self._update_drone(data)
+
+					# self._q.put(ClientReport(ClientReport.NEW, data["data"]["id"]))
+					self._q.put(ClientReport(ClientReport.NEW, self))
+			else:
+				print "socket closed"
+				# self.alive.clear()
+
+		""" Terminate the thread """
+		self._terminate_thread()
 
 	def _update_drone(self, data):
 		if data["type"] == "status":
-			self.drone.lat = data["lat"]
-			self.drone.lng = data["lng"]
-			self.drone.alt = data["alt"]
-			self.drone.lastUpdate = data["lastUpdate"]
+			self.drone.lat = data["data"]["lat"]
+			self.drone.lng = data["data"]["lng"]
+			self.drone.alt = data["data"]["alt"]
+			self.drone.lastUpdate = data["data"]["lastUpdate"]
 		if data["type"] == "reply":
 			self.drone.reply = data["reply"]
+
+	def _terminate_thread(self):
+		self._q.put(ClientReport(ClientReport.TERMINATE, self))
 	
+	def join(self, timeout=None):
+		self.alive.clear()
+		threading.Thread.join(self, timeout)
 
 	def send(self, msg):
-		self.socket.send(msg)
+		self._socket.send(msg)
 
 
 
@@ -130,37 +183,58 @@ class GCSSeverThread(threading.Thread):
 	def __init__(self, host, port):
 		super(GCSSeverThread, self).__init__()
 		self.droneList = []
+		self.pollingList = []
 		self.serverReportQueue = Queue.Queue()
-		self.clientReportQueue = Queue.Queue()
+
+		""" Use custom Pollable queue to use select both for sockets and queues """
+		self.clientReportQueue = PollableQueue()
+		self.pollingList.append(self.clientReportQueue)
 
 		try:
 			self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 			self.socket.bind((host, port))
 			self.socket.listen(5)
+			self.pollingList.append(self.socket)
 			self.serverReportQueue.put(ServerReport(ServerReport.TEXT, "Server is initiated successfully."))
 
 		except socket.error, msg:
-			text = "Couldnt connect with the socket-server: %s\n terminating server" % msg
+			text = "Couldn't connect with the socket-server: %s\n terminating server" % msg
 			self.serverReportQueue.put(ServerReport(ServerReport.TEXT, text))
 			sys.exit(1)
 
 	def run(self):
 		while True:
-			connection, address = self.socket.accept()
-			print "connection", connection
-			init_data = json.loads(connection.recv(2048))
-			id_ = str(init_data["id"])
-			text = 'A new drone %s is connected.' % id_
-			print text
-			# report = 
-			self.serverReportQueue.put(ServerReport(ServerReport.NEW, text))
+			readable, writable, exceptional = select.select(self.pollingList, [], [])
+			for s in readable:
 
-			self._create_client(connection, id_, self.clientReportQueue)
+				if s is self.socket:
+					""" New client """
+					connection, address = self.socket.accept()
+					print "connection", connection
+
+					self._create_client(connection, self.clientReportQueue)
+			
+				else:
+					""" Message from a client """
+					msg = s.get()
+					print msg
+
+					if msg.type == ClientReport.NEW:
+						""" TODO: what if id already exists? """
+						self.droneList.append(msg.data)
+						text = 'A new drone %s is connected.' % msg.data.drone.id
+						self.serverReportQueue.put(ServerReport(ServerReport.TEXT, text))
+					elif msg.type == ClientReport.TERMINATE:
+						text = 'Drone %s connection closed.' % msg.data.drone.id
+						self.droneList.remove(msg.data)
+						msg.data.join()
+						self.serverReportQueue.put(ServerReport(ServerReport.TEXT, text))
+						self.serverReportQueue.put(ServerReport(ServerReport.TERMINATE, msg.data.drone.id))
 
 
-	def _create_client(self, connection, id_, q):
-		client = DroneClientThread(connection, id_, q)
-		self.droneList.append(client)
+	def _create_client(self, connection, q):
+		client = DroneClientThread(connection, q)
+		# self.droneList.append(client)
 
 		client.start()
 

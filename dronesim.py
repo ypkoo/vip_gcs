@@ -17,11 +17,13 @@ class DroneSim(threading.Thread):
 			time.sleep(1)
 			data = {
 				"type": "status",
-				"id": self.id,
-				"lat": str(random.randrange(1, 10)),
-				"lng": str(random.randrange(1, 10)),
-				"alt": str(random.randrange(1, 10)),
-				"lastUpdate": str(datetime.datetime.now()),
+				"data": {
+					"id": self.id,
+					"lat": str(36.374092 + random.randrange(1, 10)*0.0001),
+					"lng": str(127.365638 + random.randrange(1, 10)*0.0001),
+					"alt": str(random.randrange(1, 10)),
+					"lastUpdate": str(datetime.datetime.now()),
+				},
 			}
 			# time.sleep(10)
 			self.s.send(json.dumps(data))
