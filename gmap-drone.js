@@ -3,10 +3,13 @@ var gcsMarker;
 var drone_dict = {};
 var lineList = [];
 
-
-var lineSymbol = {
-	path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW
-};
+var icons_url = {
+	'home': 'http://localhost:8000/map-icons/icon-gcs2-home.png',
+	'idle': 'http://localhost:8000/map-icons/icon-gcs2-blue.png',
+	'tracking' : 'http://localhost:8000/map-icons/icon-gcs2-green.png',
+	'red': 'http://localhost:8000/map-icons/icon-gcs2-red.png',
+	'yellow': 'http://localhost:8000/map-icons/icon-gcs2-blue.png'
+}
 
 // Initialize the map. Called when this file is loaded.
 function initMap() {
@@ -24,8 +27,11 @@ function initMap() {
 	//Locations of the GCS
 	gcsMarker = new google.maps.Marker({
 		position: GCSLatLng,
-		icon: 'http://localhost:8000/map-icons/icon-gcs2-home.png'
+		map: map,
+		icon: icons_url['home']
 	});
+
+	console.log("hello");
 }
 
 // map listener
@@ -50,7 +56,7 @@ function update_marker(id, lat, lng) {
 	else {
 		var marker = new google.maps.Marker({
 			position: {lat: lat, lng: lng},
-			icon: 'http://localhost:8000/map-icons/icon-gcs2-blue.png',
+			icon: icons_url['idle'],
 			label: {
 			    text: id + '',
 			    color: 'white',
@@ -79,6 +85,14 @@ function update_marker(id, lat, lng) {
 	}
 }
 
+function change_drone_status(id, status){
+
+	if (id in drone_dict){
+		var marker = drone_dict[id];
+		marker.setIcon(icons_url[status]);
+	}
+	
+}
 
 // removes marker from the map
 function remove_marker(id) {
@@ -98,53 +112,3 @@ function remove_all_markers() {
 	drone_dict = {};
 }
 
-
-function draw_line(startLat, startLng, endLat, endLng) {
-	var line = new google.maps.Polyline({
-		path: [{lat: startLat, lng: startLng}, {lat: endLat, lng: endLng}],
-		icons: [{
-			icon: lineSymbol,
-			offset: '100%'
-		}],
-		// geodesic: true,
-		// strokeColor: '#FF0000',
-		// strokeOpacity: 1.0,
-		// strokeWeight: 2,
-		map: map
-	});
-	// console.log(startLat);
-
-	// var lineCoordinate = [{lat: startLat, lng: startLng}, {lat: endLat, lng: endLng}];
- //  var line = new google.maps.Polyline({
- //    path: lineCoordinate,
- //    geodesic: true,
- //    strokeColor: '#FF0000',
- //    strokeOpacity: 1.0,
- //    strokeWeight: 2
- //  });
-
- //  line.setMap(map);
-
-
-
-	lineList.push(line);
-}
-
-function remove_all_lines() {
-	for (var i=0; i<lineList.length; i++) {
-		lineList[i].setMap(null);
-	}
-
-	lineList = [];
-}
-
-
-function mark_gcs_position(lat, lng) {
-	gcsMarker.setPosition({lat: lat, lng: lng});
-	gcsMarker.setMap(map);
-}
-
-function distance(lat1, lng1, lat2, lng2) {
-	return google.maps.geometry.spherical.computeDistanceBetween(
-		{lat: lat1, lng: lng1}, {lat: lat2, lng: lng2});
-}

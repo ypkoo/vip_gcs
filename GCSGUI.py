@@ -122,7 +122,7 @@ class MainFrame(QWidget):
 		self.mapBtn.raise_()
 		self.streamingBtn.raise_()
 
-	def create_gcs_server(self):
+	# def create_gcs_server(self):
 
 
 
