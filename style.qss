@@ -22,3 +22,8 @@ QPushButton
   margin: 0;
   /*border: 3px solid rgb(255,255,255);*/
 }
+
+QTextEdit
+{
+	
+}

@@ -101,25 +101,47 @@ class MainFrame(QWidget):
 		
 		self.gmapLayout = QGridLayout()
 		self.gmap = GMapWebView("gmap-drone.html", self.jsSignal)
+
+		fontDB = QFontDatabase()
+		latoLight = fontDB.addApplicationFont("fonts/Lato/Lato-Light.ttf")
+		if latoLight < 0:
+			print "font load failed"
+		latoLightFont = fontDB.font("fonts/Lato/Lato-Light.ttf", "normal", 12)
+		# if not latoLight == -1:
+		# 	print "font load successed"
+		# 	fontDB = QFontDatabase()
+		# 	self.fontStyles = fontDB.styles('LatoLight')
+		# 	self.fontFamilies = QFontDatabase.applicationFontFamilies(latoLight)
+		# 	for fontFamily in self.fontFamilies:
+		# 		self.font = fontDB.font(fontFamily, self.fontStyles.first(), 24)
+
 		self.logText = QTextEdit()
 		self.logText.setReadOnly(True)
+		# self.logText.setFont(latoLightFont)
 		
 		self.logText.setStyleSheet("""
 			background-color:rgba(0, 0, 0, 50%);
 			color: white;
-			padding: 3px;
+			padding: 10px;
 			margin-right: 20px;
 			margin-bottom: 10px;
-			border: none;""")
+			border-style: solid;
+			border-color: white;
+			border-radius: 20px;""")
+
 		self.takeoffBtn = QPushButton("")
 		self.takeoffBtn.setIcon(QIcon('image/takoff.png'))
 		self.takeoffBtn.setIconSize(QSize(130,130))
 		self.targetBtn = QPushButton("")
 		self.targetBtn.setIcon(QIcon('image/target.png'))
 		self.targetBtn.setIconSize(QSize(130,130))
+		self.stopBtn = QPushButton("")
+		self.stopBtn.setIcon(QIcon('image/target.png'))
+		self.stopBtn.setIconSize(QSize(130,130))
 
 		self.takeoffBtn.clicked.connect(self.on_takeoff_clicked)
 		self.targetBtn.clicked.connect(self.on_target_clicked)
+		self.stopBtn.clicked.connect(self.on_stop_clicked)
 
 		# self.gmapLayout.addWidget(self.gmap, 0, 0, 2, 5)
 		# self.gmapLayout.addWidget(self.logText, 1, 4, 1, 1)
@@ -127,11 +149,12 @@ class MainFrame(QWidget):
 		# self.gmapLayout.addWidget(self.targetBtn, 1, 2, 1, 1)
 
 		self.gmapLayout.addWidget(self.gmap, 0, 0, 3, 6)
-		self.gmapLayout.addWidget(self.droneStatusLayout, 0, 5, 1, 1)
-		self.gmapLayout.addWidget(self.textCommandLayout, 1, 1, 1, 3)
+		self.gmapLayout.addWidget(self.droneStatusLayout, 0, 5, 2, 1)
+		# self.gmapLayout.addWidget(self.textCommandLayout, 1, 1, 1, 3)
 		self.gmapLayout.addWidget(self.logText, 2, 4, 1, 2)
 		self.gmapLayout.addWidget(self.takeoffBtn, 2, 1, 1, 1)
 		self.gmapLayout.addWidget(self.targetBtn, 2, 2, 1, 1)
+		self.gmapLayout.addWidget(self.stopBtn, 2, 3, 1, 1)
 
 		self.gmapLayout.setColumnStretch(0, 1)
 		self.gmapLayout.setColumnStretch(1, 1)
@@ -163,10 +186,12 @@ class MainFrame(QWidget):
 		self.stackedLayout.addWidget(self.streaming)
 
 		self.gridLayout = QGridLayout()
-		self.gridLayout.addWidget(self.stackedLayout, 0, 0, 1, 2)
+		self.gridLayout.addWidget(self.stackedLayout, 0, 0, 2, 2)
 		self.gridLayout.addWidget(self.navBar, 0, 0, 1, 1)
 		self.gridLayout.setColumnStretch(0, 1)
 		self.gridLayout.setColumnStretch(1, 10)
+		self.gmapLayout.setRowStretch(0, 1)
+		self.gmapLayout.setRowStretch(1, 4)
 
 		self.setLayout(self.gridLayout)
 		self.resize(2280, 1520)
@@ -175,43 +200,48 @@ class MainFrame(QWidget):
 		command = {
 			"type": "control",
 			"data": {
-				"id": "1",
-				"command": "home",
+				"command": "start",
 				"timestamp": str(datetime.datetime.now()),
 			}
 		}
-		self.server.send("1", json.dumps(command))
+		self.server.send_to_all(json.dumps(command))
 
-		text = "Send takeoff command to drone 1"
+		text = "Send start command to drones"
 		self.logText.append(text)
 
 	def on_target_clicked(self):
-		if self.context.lat:
-			command = {
-				"type": "control",
-				"data": {
-					"id": "1",
-					"command": "relocation",
-					"lat": self.context.lat,
-					"lng": self.context.lng,
-					"alt": "5",
-					"timestamp": str(datetime.datetime.now()),
-				}
+		command = {
+			"type": "control",
+			"data": {
+				"command": "go",
+				"timestamp": str(datetime.datetime.now()),
 			}
-			self.server.send("1", json.dumps(command))
+		}
+		self.server.send_to_all(json.dumps(command))
 
-			text = "Send relocation command to drone 1"
-			self.logText.append(text)
+		text = "Send go command to drone 1"
+		self.logText.append(text)
+
+	def on_stop_clicked(self):
+		command = {
+			"type": "control",
+			"data": {
+				"command": "stop",
+				"timestamp": str(datetime.datetime.now()),
+			}
+		}
+		self.server.send_to_all(json.dumps(command))
+
+		text = "Send stop command to drone 1"
+		self.logText.append(text)
 
 	def on_map_clicked(self):
-		print "clicked"
 		self.stackedLayout.setCurrentIndex(0)
 		self.mapBtn.raise_()
 		self.streamingBtn.raise_()
 
 
 	def on_streaming_clicked(self):
-		print "clicked"
 		self.stackedLayout.setCurrentIndex(1)
 		self.mapBtn.raise_()
 		self.streamingBtn.raise_()
@@ -229,7 +259,7 @@ class MainFrame(QWidget):
 
 	def gcs_server_init(self):
 		self.logText.append("Connecting to the server...")
-		self.server = GCSSeverThread("127.0.0.1", 43213)
+		self.server = GCSSeverThread("127.0.0.1", 43212)
 
 		""" Server timer init """
 		self.server_timer = QTimer(self)
@@ -271,10 +301,12 @@ class MainFrame(QWidget):
 				
 			elif serverReport.type == ServerReport.NEW:
 				# self.logText.append(serverReport.data)
+				self.logText.append('A new drone %s is connected.' % serverReport.data)
 				self.droneStatusLayout.add(serverReport.data)
 			elif serverReport.type == ServerReport.TERMINATE:
 				self.gmap.frame.evaluateJavaScript('remove_marker(%s)' % serverReport.data)
 				self.droneStatusLayout.remove(serverReport.data)
+				self.logText.append('Drone %s connection closed.' % serverReport.data)
 
 		except Queue.Empty as e:
 			pass
@@ -283,6 +315,8 @@ class MainFrame(QWidget):
 		for drone in self.server.droneList:
 			info = drone.drone.get_info()
 			print info
+
+			self.droneStatusLayout.setStatus(info)
 			self.gmap.frame.evaluateJavaScript('update_marker(%s, %s, %s)' % (info['id'], info['location']['lat'], info['location']['lng']))
 
 
@@ -293,6 +327,18 @@ class MainFrame(QWidget):
 if __name__ == '__main__':
 	signal.signal(signal.SIGINT, signal.SIG_DFL)
 	app = QApplication(sys.argv)
+	QFontDatabase.addApplicationFont("/home/ypkoo/VIP_GCS/fonts/Lato/Lato-Light.ttf")
+	QFontDatabase.addApplicationFont("/home/ypkoo/VIP_GCS/fonts/Lato/Lato-Bold.ttf")
+	QFontDatabase.addApplicationFont("/home/ypkoo/VIP_GCS/fonts/Open_Sans/OpenSans-Light.ttf")
+	# latoLight = QFontDatabase.addApplicationFont("fonts/Lato/Lato-Light.ttf")
+	# if not latoLight == -1:
+	# 	print "font load successed"
+	# 	fontDB = QtGui.QFontDatabase()
+	# 	self.fontStyles = fontDB.styles('LatoLight')
+	# 	self.fontFamilies = QFontDatabase.applicationFontFamilies(latoLight)
+	# 	for fontFamily in self.fontFamilies:
+	# 		self.font = fontDB.font(fontFamily, self.fontStyles.first(), 24)
+
 	style = QSSHelper.open_qss('style.qss')
 	app.setStyleSheet(style)
 	frame = MainFrame()

@@ -104,10 +104,11 @@ class Drone(object):
 
 class DroneClientThread(threading.Thread):
 
-	def __init__(self, connection, q):
+	def __init__(self, connection, q, send_to_all=None):
 		super(DroneClientThread, self).__init__()
 		self._socket = connection
 		self._q = q
+		self.send_to_all = send_to_all
 		self.drone = None
 		self.isM600 = None
 
@@ -125,12 +126,22 @@ class DroneClientThread(threading.Thread):
 				if self.drone:
 					
 					self._update_drone(data)
+					if self.isM600:
+						msg = {
+							"type": "M600",
+							"data": {
+								"lat": self.drone.lat,
+								"lng": self.drone.lng,
+								"alt": self.drone.alt,
+							},
+						}
+						self.send_to_all(json.dumps(msg))
 				else:
 					if data["data"]["id"] == "1":
 						self.isM600 = True
 					else:
 						self.isM600 = False
-						
+
 					self.drone = Drone(data["data"]["id"])
 					self._update_drone(data)
 
@@ -221,17 +232,17 @@ class GCSSeverThread(threading.Thread):
 						self.droneList.append(msg.data)
 						text = 'A new drone %s is connected.' % msg.data.drone.id
 						self.serverReportQueue.put(ServerReport(ServerReport.NEW, msg.data.drone.id))
-						self.serverReportQueue.put(ServerReport(ServerReport.TEXT, text))
+						# self.serverReportQueue.put(ServerReport(ServerReport.TEXT, text))
 					elif msg.type == ClientReport.TERMINATE:
 						text = 'Drone %s connection closed.' % msg.data.drone.id
 						self.droneList.remove(msg.data)
 						msg.data.join()
-						self.serverReportQueue.put(ServerReport(ServerReport.TEXT, text))
+						# self.serverReportQueue.put(ServerReport(ServerReport.TEXT, text))
 						self.serverReportQueue.put(ServerReport(ServerReport.TERMINATE, msg.data.drone.id))
 
 
 	def _create_client(self, connection, q):
-		client = DroneClientThread(connection, q)
+		client = DroneClientThread(connection, q, self.send_to_all)
 		# self.droneList.append(client)
 
 		client.start()
@@ -239,6 +250,11 @@ class GCSSeverThread(threading.Thread):
 	def send(self, id_, msg):
 		for drone in self.droneList:
 			if drone.drone.id == id_:
+				drone.send(msg)
+
+	def send_to_all(self, msg):
+		for drone in self.droneList:
+			if not drone.isM600:
 				drone.send(msg)
 
 

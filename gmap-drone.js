@@ -73,6 +73,9 @@ function update_marker(id, lat, lng) {
 			map: map
 		});
 
+		if (id == "1")
+			marker.setIcon(icons_url['red']);
+
 		marker.addListener('click', function() {
 			markerPos = marker.getPosition()
 			gcsPos = gcsMarker.getPosition()

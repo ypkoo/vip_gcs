@@ -112,25 +112,46 @@ class VipStatusLayout(QWidget):
 	"""
 		status:
 	"""
-	def setStatus(self, status):
+	def setStatus(self, info):
 		for droneStatus in self._droneStatusList:
-			if droneStatus.id == id_:
+			if droneStatus.id == info['id']:
 				target = droneStatus
+				print "find!"
 				break
 
-		# target
+		target.setStatus(info)
 
 
 
-class VipDroneStatus(QLabel):
+class VipDroneStatus(QWidget):
 	def __init__(self, id_):
 		super(VipDroneStatus, self).__init__()
 
+		self._layout = QGridLayout()
+
+		self.statusText = QLabel("Drone %s\n\n\n" % (id_))
+		# self.statusText.setReadOnly(True)
+		self.setLayout(self._layout)
+		self._layout.addWidget(self.statusText, 0, 0)
+		
+
+
 		self.id = id_
-		self.setText("Drone %s\n\n\n" % self.id)
+		# self.setText("Drone %s\n\n\n" % self.id)
 		self.setStyleSheet("""
 			background-color: rgba(0, 0, 0, 50%);
+			border-radius: 20px;
 			color: white;""")
+
+	def setStatus(self, info):
+		text = """Drone %s
+lat: %s
+lng: %s
+alt: %s""" % (info['id'], info['location']['lat'], info['location']['lng'], info['location']['alt'])
+
+		self.statusText.setText(text)
+		
+
 
 
 
