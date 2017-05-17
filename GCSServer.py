@@ -8,39 +8,12 @@ Eli Bendersky's code sample (http://eli.thegreenplace.net/2011/05/18/code-sample
 Pollable Queue http://chimera.labs.oreilly.com/books/1230000000393/ch12.html
 """
 
-import socket, struct, threading, Queue, select, json, sys
+import socket, struct, threading, Queue, select, json, sys, time
+from AlexaServer import AlexaHandler
+from VipQueueMsgType import *
 
 
-class Reply(object):
-	"""
-	A reply from a client thread. Each type has its associated data:
 
-	ERROR:
-		The error string
-	SUCCESS:
-		The received message
-	"""
-	ERROR, SUCCESS = range(2)
-
-	def __init__(self, type, data=None):
-		self.type = type
-		self.data = data
-
-class ClientReport(object):
-
-	NEW, TERMINATE = range(2)
-
-	def __init__(self, type_, data=None):
-		self.type = type_
-		self.data = data
-
-class ServerReport(object):
-
-	NEW, TEXT, TERMINATE = range(3)
-
-	def __init__(self, type_, data=None):
-		self.type = type_
-		self.data = data
 
 class PollableQueue(Queue.Queue, object):
 	def __init__(self):
@@ -174,6 +147,19 @@ class DroneClientThread(threading.Thread):
 		self._socket.send(msg)
 
 
+class AlexaServer(threading.Thread):
+
+	def __init__(self, q):
+		super(AlexaServer, self).__init__()
+		self.alexaHandler = AlexaHandler(q)
+		server = HTTPServer(('', PORT), self.alexaHandler)
+		print('Start server. port:', PORT)
+		self.alive = threading.Event()
+		self.alive.set()
+		
+
+	def run():
+		server.serve_forever()
 
 
 class GCSSeverThread(threading.Thread):
@@ -194,6 +180,9 @@ class GCSSeverThread(threading.Thread):
 		self.pollingList = []
 		self.serverReportQueue = Queue.Queue()
 
+		self.alive = threading.Event()
+		self.alive.set()
+
 		""" Use custom Pollable queue to use select both for sockets and queues """
 		self.clientReportQueue = PollableQueue()
 		self.pollingList.append(self.clientReportQueue)
@@ -211,14 +200,14 @@ class GCSSeverThread(threading.Thread):
 			sys.exit(1)
 
 	def run(self):
-		while True:
-			readable, writable, exceptional = select.select(self.pollingList, [], [])
+		while self.alive.isSet():
+			readable, writable, exceptional = select.select(self.pollingList, [], [], 1)
 			for s in readable:
 
 				if s is self.socket:
 					""" New client """
 					connection, address = self.socket.accept()
-					print "connection", connection
+					print "connection", connection, "address", address
 
 					self._create_client(connection, self.clientReportQueue)
 			
@@ -239,6 +228,34 @@ class GCSSeverThread(threading.Thread):
 						msg.data.join()
 						# self.serverReportQueue.put(ServerReport(ServerReport.TEXT, text))
 						self.serverReportQueue.put(ServerReport(ServerReport.TERMINATE, msg.data.drone.id))
+					elif msg.type == ClientReport.ALEXA:
+						if msg.data == "start":
+							command = {
+								"type": "control",
+								"data": {
+									"command": "start",
+									"timestamp": str(datetime.datetime.now()),
+								}
+							}
+							self.send_to_all(json.dumps(command))
+						elif msg.data == "go":
+							command = {
+								"type": "control",
+								"data": {
+									"command": "go",
+									"timestamp": str(datetime.datetime.now()),
+								}
+							}
+							self.send_to_all(json.dumps(command))
+						elif msg.data == "stop":
+							command = {
+								"type": "control",
+								"data": {
+									"command": "stop",
+									"timestamp": str(datetime.datetime.now()),
+								}
+							}
+							self.send_to_all(json.dumps(command))
 
 
 	def _create_client(self, connection, q):
@@ -260,5 +277,13 @@ class GCSSeverThread(threading.Thread):
 
 
 if __name__ == "__main__":
-	server = GCSSeverThread("127.0.0.1", 41234)
+	server = GCSSeverThread("127.0.0.1", 43212)
 	server.start()
+
+	try:
+		while True:
+			time.sleep(.1)
+	except KeyboardInterrupt:
+		print "KeyboardInterrupt"
+
+		server.alive.clear()
