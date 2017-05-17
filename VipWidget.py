@@ -24,6 +24,7 @@ class VipNavBar(QWidget):
 		self.setMouseTracking(True)
 
 
+	""" TODO: add declaration of VipNavBarBtn here """
 	def add_btn(self, btn):
 		self._btnList.append(btn)
 		self._layout.addWidget(btn)
@@ -68,3 +69,114 @@ class VipNavBarBtn(QPushButton):
 		# self.setStyleSheet("background-color:yellow;")
 		self.setIcon(self.icon_others_hover)
 		pass
+
+class VipStatusLayout(QWidget):
+	def __init__(self):
+		super(VipStatusLayout, self).__init__()
+
+		self._droneStatusList = []
+
+		self._layout = QVBoxLayout()
+
+		""" remove margin and padding """
+		self._layout.setSpacing(0)
+		# self._layout.setContentsMargins(10,10,10,10)
+
+		self._layout.setAlignment(Qt.AlignTop)
+		self.setStyleSheet("""
+			background-color:rgba(0, 0, 0, 100%);
+			padding-top: 20px;
+			margin: 10px;""")
+
+
+		self.setLayout(self._layout)
+		# self.setMouseTracking(True)
+
+	def add(self, id_):
+		# self._btnList.append(btn)
+		status = VipDroneStatus(id_)
+		self._droneStatusList.append(status)
+		self._layout.addWidget(status)
+
+	def remove(self, id_):
+		for droneStatus in self._droneStatusList:
+			if droneStatus.id == id_:
+				toRemove = droneStatus
+				break
+
+		self._layout.removeWidget(toRemove)
+		toRemove.deleteLater()
+		self._droneStatusList.remove(toRemove)
+		toRemove = None
+
+	"""
+		status:
+	"""
+	def setStatus(self, status):
+		for droneStatus in self._droneStatusList:
+			if droneStatus.id == id_:
+				target = droneStatus
+				break
+
+		# target
+
+
+
+class VipDroneStatus(QLabel):
+	def __init__(self, id_):
+		super(VipDroneStatus, self).__init__()
+
+		self.id = id_
+		self.setText("Drone %s\n\n\n" % self.id)
+		self.setStyleSheet("""
+			background-color: rgba(0, 0, 0, 50%);
+			color: white;""")
+
+
+
+class VipTextCommandLayout(QWidget):
+	def __init__(self):
+		super(VipTextCommandLayout, self).__init__()
+
+		# self._btnList = []
+
+		self._layout = QHBoxLayout()
+		self.commandText = QTextEdit()
+		self.commandBtn = QPushButton("send")
+
+		self.commandText.setStyleSheet("""
+			background-color:rgba(0, 0, 0, 50%);
+			color: white;
+			padding-top: 20px;
+			margin: 10px;""")
+		self.commandBtn.setStyleSheet("""
+			background-color:rgba(0, 0, 0, 50%);
+			color: white;
+			padding-top: 20px;
+			margin: 10px;""")
+
+		self._layout.addWidget(self.commandText)
+		self._layout.addWidget(self.commandBtn)
+
+		""" remove margin and padding """
+		self._layout.setSpacing(0)
+		# self._layout.setContentsMargins(10,10,10,10)
+
+		# self._layout.setAlignment(Qt.AlignCenter)
+		self.setStyleSheet("""
+			background-color:rgba(0, 0, 0, 100%);
+			padding-top: 20px;
+			margin: 0px;""")
+
+
+		self.setLayout(self._layout)
+		# self.setMouseTracking(True)
+
+	def add(self, btn):
+		# self._btnList.append(btn)
+		btn.setStyleSheet("""
+			background-color:rgba(0, 0, 0, 50%);
+			color: white;
+			padding-top: 20px;
+			margin: 10px;""")
+		self._layout.addWidget(btn)

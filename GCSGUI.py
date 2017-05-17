@@ -52,8 +52,17 @@ class MainFrame(QWidget):
 		
 		self.navBar.add_btn(self.mapBtn)
 		self.navBar.add_btn(self.streamingBtn)
-		# self.navBar.add_btn(self.Btn1)
-		# self.navBar.add_btn(self.Btn2)
+
+		self.droneStatusLayout = VipStatusLayout()
+		# self.droneStatusLable1 = QLabel()
+		# self.droneStatusLable2 = QLabel()
+		# self.droneStatusLable1.setWordWrap(True)
+		# self.droneStatusLable1.setText("testtestseaaaaaaaaaaaaaaaaaaa\natasdfasdfl;aksdjf;laskdjfl;askdf")
+		# self.droneStatusLayout.add(self.droneStatusLable1)
+		# self.droneStatusLayout.add(self.droneStatusLable2)
+
+		self.textCommandLayout = VipTextCommandLayout()
+		self.textCommandLayout.commandBtn.clicked.connect(self.on_textcommand_clicked)
 
 		
 		self.streamingBtn.clicked.connect(self.on_streaming_clicked)
@@ -81,18 +90,36 @@ class MainFrame(QWidget):
 
 		self.takeoffBtn.clicked.connect(self.on_takeoff_clicked)
 
-		self.gmapLayout.addWidget(self.gmap, 0, 0, 2, 5)
-		self.gmapLayout.addWidget(self.logText, 1, 4, 1, 1)
-		self.gmapLayout.addWidget(self.takeoffBtn, 1, 1, 1, 1)
-		self.gmapLayout.addWidget(self.targetBtn, 1, 2, 1, 1)
+		# self.gmapLayout.addWidget(self.gmap, 0, 0, 2, 5)
+		# self.gmapLayout.addWidget(self.logText, 1, 4, 1, 1)
+		# self.gmapLayout.addWidget(self.takeoffBtn, 1, 1, 1, 1)
+		# self.gmapLayout.addWidget(self.targetBtn, 1, 2, 1, 1)
+
+		self.gmapLayout.addWidget(self.gmap, 0, 0, 3, 6)
+		self.gmapLayout.addWidget(self.droneStatusLayout, 0, 5, 1, 1)
+		self.gmapLayout.addWidget(self.textCommandLayout, 1, 4, 1, 2)
+		self.gmapLayout.addWidget(self.logText, 2, 4, 1, 2)
+		self.gmapLayout.addWidget(self.takeoffBtn, 2, 1, 1, 1)
+		self.gmapLayout.addWidget(self.targetBtn, 2, 2, 1, 1)
 
 		self.gmapLayout.setColumnStretch(0, 1)
 		self.gmapLayout.setColumnStretch(1, 1)
 		self.gmapLayout.setColumnStretch(2, 1)
 		self.gmapLayout.setColumnStretch(3, 1)
 		self.gmapLayout.setColumnStretch(4, 2)
-		self.gmapLayout.setRowStretch(0, 3)
+		self.gmapLayout.setColumnStretch(5, 2)
+		self.gmapLayout.setRowStretch(0, 6)
 		self.gmapLayout.setRowStretch(1, 1)
+		self.gmapLayout.setRowStretch(2, 2)
+		
+
+		# self.gmapLayout.setColumnStretch(0, 1)
+		# self.gmapLayout.setColumnStretch(1, 1)
+		# self.gmapLayout.setColumnStretch(2, 1)
+		# self.gmapLayout.setColumnStretch(3, 1)
+		# self.gmapLayout.setColumnStretch(4, 2)
+		# self.gmapLayout.setRowStretch(0, 3)
+		# self.gmapLayout.setRowStretch(1, 1)
 		self.gmapWidget = QWidget()
 		self.gmapWidget.setLayout(self.gmapLayout)
 		self.stackedLayout.addWidget(self.gmapWidget)
@@ -129,6 +156,11 @@ class MainFrame(QWidget):
 		self.mapBtn.raise_()
 		self.streamingBtn.raise_()
 
+	def on_textcommand_clicked(self):
+		textCommand = self.textCommandLayout.commandText.toPlainText()
+		if self.server.droneList[0]:
+			self.server.send("1", textCommand)
+
 
 	def gcs_server_init(self):
 		self.logText.append("Connecting to the server...")
@@ -149,9 +181,11 @@ class MainFrame(QWidget):
 
 				
 			elif serverReport.type == ServerReport.NEW:
-				self.logText.append(serverReport.data)
+				# self.logText.append(serverReport.data)
+				self.droneStatusLayout.add(serverReport.data)
 			elif serverReport.type == ServerReport.TERMINATE:
 				self.gmap.frame.evaluateJavaScript('remove_marker(%s)' % serverReport.data)
+				self.droneStatusLayout.remove(serverReport.data)
 
 		except Queue.Empty as e:
 			pass

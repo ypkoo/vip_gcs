@@ -132,7 +132,7 @@ class DroneClientThread(threading.Thread):
 					self._q.put(ClientReport(ClientReport.NEW, self))
 			else:
 				print "socket closed"
-				# self.alive.clear()
+				self.alive.clear()
 
 		""" Terminate the thread """
 		self._terminate_thread()
@@ -214,6 +214,7 @@ class GCSSeverThread(threading.Thread):
 						""" TODO: what if id already exists? """
 						self.droneList.append(msg.data)
 						text = 'A new drone %s is connected.' % msg.data.drone.id
+						self.serverReportQueue.put(ServerReport(ServerReport.NEW, msg.data.drone.id))
 						self.serverReportQueue.put(ServerReport(ServerReport.TEXT, text))
 					elif msg.type == ClientReport.TERMINATE:
 						text = 'Drone %s connection closed.' % msg.data.drone.id
