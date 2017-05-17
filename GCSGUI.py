@@ -217,9 +217,14 @@ class MainFrame(QWidget):
 		self.streamingBtn.raise_()
 
 	def on_textcommand_clicked(self):
-		textCommand = self.textCommandLayout.commandText.toPlainText()
-		if self.server.droneList[0]:
-			self.server.send("1", textCommand)
+		textCommand = str(self.textCommandLayout.commandText.toPlainText())
+		command = {
+				"type": "textcommand",
+				"data": textCommand,
+			}
+		self.server.send("1", json.dumps(command))
+		text = "Send text command %s to drone 1" % textCommand
+		self.logText.append(text)
 
 
 	def gcs_server_init(self):
