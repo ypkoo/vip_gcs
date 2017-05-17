@@ -8,8 +8,8 @@ Eli Bendersky's code sample (http://eli.thegreenplace.net/2011/05/18/code-sample
 Pollable Queue http://chimera.labs.oreilly.com/books/1230000000393/ch12.html
 """
 
-import socket, struct, threading, Queue, select, json, sys, time
-from AlexaServer import AlexaHandler
+import socket, struct, threading, Queue, select, json, sys, time, datetime
+from AlexaServer import make_alexa_handler_class
 from VipQueueMsgType import *
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 
@@ -151,7 +151,7 @@ class AlexaServer(threading.Thread):
 
 	def __init__(self, q):
 		super(AlexaServer, self).__init__()
-		self.alexaHandler = AlexaHandler(q)
+		self.alexaHandler = make_alexa_handler_class(q)
 		self.server = HTTPServer(('', 8000), self.alexaHandler)
 		print('Start server. port:', 8000)
 		self.alive = threading.Event()
@@ -233,11 +233,15 @@ class GCSSeverThread(threading.Thread):
 						# self.serverReportQueue.put(ServerReport(ServerReport.TEXT, text))
 						self.serverReportQueue.put(ServerReport(ServerReport.TERMINATE, msg.data.drone.id))
 					elif msg.type == ClientReport.ALEXA:
+						m600 = self.drone_by_id("1")
 						if msg.data == "start":
 							command = {
 								"type": "control",
 								"data": {
 									"command": "start",
+									"lat": m600.drone.lat,
+									"lng": m600.drone.lng,
+									"alt": m600.drone.alt,
 									"timestamp": str(datetime.datetime.now()),
 								}
 							}
@@ -247,6 +251,9 @@ class GCSSeverThread(threading.Thread):
 								"type": "control",
 								"data": {
 									"command": "go",
+									"lat": m600.drone.lat,
+									"lng": m600.drone.lng,
+									"alt": m600.drone.alt,
 									"timestamp": str(datetime.datetime.now()),
 								}
 							}
@@ -256,6 +263,9 @@ class GCSSeverThread(threading.Thread):
 								"type": "control",
 								"data": {
 									"command": "stop",
+									"lat": m600.drone.lat,
+									"lng": m600.drone.lng,
+									"alt": m600.drone.alt,
 									"timestamp": str(datetime.datetime.now()),
 								}
 							}
@@ -274,6 +284,11 @@ class GCSSeverThread(threading.Thread):
 		for drone in self.droneList:
 			if drone.drone.id == id_:
 				drone.send(msg)
+
+	def drone_by_id(self, id_):
+		for drone in self.droneList:
+			if drone.drone.id == id_:
+				return drone
 
 	def send_to_all(self, msg):
 		for drone in self.droneList:

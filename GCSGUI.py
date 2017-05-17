@@ -45,6 +45,10 @@ class VipContext(object):
 		curLng = None
 		curAlt = None
 
+		m600Lat = None
+		m600Lng = None
+		m600Alt = None
+
 class MainFrame(QWidget):
 
 	jsSignal = pyqtSignal(str)
@@ -197,43 +201,55 @@ class MainFrame(QWidget):
 		self.resize(2280, 1520)
 
 	def on_takeoff_clicked(self):
-		command = {
-			"type": "control",
-			"data": {
-				"command": "start",
-				"timestamp": str(datetime.datetime.now()),
+		if context.m600Lat:
+			command = {
+				"type": "control",
+				"data": {
+					"command": "start",
+					"lat": self.context.m600Lat,
+					"lng": self.context.m600Lng,
+					"alt": self.context.m600Alt,
+					"timestamp": str(datetime.datetime.now()),
+				}
 			}
-		}
-		self.server.send_to_all(json.dumps(command))
+			self.server.send_to_all(json.dumps(command))
 
-		text = "Send start command to drones"
-		self.logText.append(text)
+			text = "Send start command to drones"
+			self.logText.append(text)
 
 	def on_target_clicked(self):
-		command = {
-			"type": "control",
-			"data": {
-				"command": "go",
-				"timestamp": str(datetime.datetime.now()),
+		if context.m600Lat:
+			command = {
+				"type": "control",
+				"data": {
+					"command": "go",
+					"lat": self.context.m600Lat,
+					"lng": self.context.m600Lng,
+					"alt": self.context.m600Alt,
+					"timestamp": str(datetime.datetime.now()),
+				}
 			}
-		}
-		self.server.send_to_all(json.dumps(command))
+			self.server.send_to_all(json.dumps(command))
 
-		text = "Send go command to drone 1"
-		self.logText.append(text)
+			text = "Send go command to drone 1"
+			self.logText.append(text)
 
 	def on_stop_clicked(self):
-		command = {
-			"type": "control",
-			"data": {
-				"command": "stop",
-				"timestamp": str(datetime.datetime.now()),
+		if context.m600Lat:
+			command = {
+				"type": "control",
+				"data": {
+					"command": "stop",
+					"lat": self.context.m600Lat,
+					"lng": self.context.m600Lng,
+					"alt": self.context.m600Alt,
+					"timestamp": str(datetime.datetime.now()),
+				}
 			}
-		}
-		self.server.send_to_all(json.dumps(command))
+			self.server.send_to_all(json.dumps(command))
 
-		text = "Send stop command to drone 1"
-		self.logText.append(text)
+			text = "Send stop command to drone 1"
+			self.logText.append(text)
 
 	def on_map_clicked(self):
 		self.stackedLayout.setCurrentIndex(0)
@@ -315,6 +331,11 @@ class MainFrame(QWidget):
 		for drone in self.server.droneList:
 			info = drone.drone.get_info()
 			print info
+
+			if info['id'] == "1":
+				self.context.m600Lat = info['location']['lat']
+				self.context.m600Lng = info['location']['lng']
+				self.context.m600Alt = info['location']['alt']
 
 			self.droneStatusLayout.setStatus(info)
 			self.gmap.frame.evaluateJavaScript('update_marker(%s, %s, %s)' % (info['id'], info['location']['lat'], info['location']['lng']))
