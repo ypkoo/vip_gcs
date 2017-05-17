@@ -109,6 +109,7 @@ class DroneClientThread(threading.Thread):
 		self._socket = connection
 		self._q = q
 		self.drone = None
+		self.isM600 = None
 
 		self.alive = threading.Event()
 		self.alive.set()
@@ -125,6 +126,11 @@ class DroneClientThread(threading.Thread):
 					
 					self._update_drone(data)
 				else:
+					if data["data"]["id"] == "1":
+						self.isM600 = True
+					else:
+						self.isM600 = False
+						
 					self.drone = Drone(data["data"]["id"])
 					self._update_drone(data)
 
