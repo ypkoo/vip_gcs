@@ -5,28 +5,58 @@ from PyQt4.QtNetwork import QNetworkAccessManager, QNetworkRequest
 from VipWidget import *
 from GCSServer import *
 
-import sys, os, time, signal
+import sys, os, time, signal, json, datetime
 from aqua.qsshelper import QSSHelper
+
+
+class JSCommunicator(QObject):
+	def __init__(self, signal):
+		super(JSCommunicator, self).__init__()
+
+		self.signal = signal
+
+	@pyqtSlot(str)
+	def emit_signal(self, msg):
+		self.signal.emit(msg)
 
 
 class GMapWebView(QWebView):
 
-	def __init__(self, source):
+	def __init__(self, source, signal):
 		super(GMapWebView, self).__init__()
+
+		
 		file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), source))
 		local_url = QUrl.fromLocalFile(file_path)
 		self.load(local_url)
 
-		self.frame = self.page().mainFrame()
+		self.signal = signal
+		self.jsCommunicator = JSCommunicator(self.signal)
 
+		self.frame = self.page().mainFrame()
+		self.frame.addToJavaScriptWindowObject('jsCommunicator', self.jsCommunicator)
+
+
+class VipContext(object):
+
+	def __init__(self):
+
+		curLat = None
+		curLng = None
+		curAlt = None
 
 class MainFrame(QWidget):
+
+	jsSignal = pyqtSignal(str)
 
 	def __init__(self):
 		super(MainFrame, self).__init__()
 
 		self.frame_init()
 		self.gcs_server_init()
+		# jsSignal = pyqtSignal(str)
+		self.jsSignal.connect(self.js_signal_handler)
+		self.context = VipContext()
 		
 	
 	def frame_init(self):
@@ -70,7 +100,7 @@ class MainFrame(QWidget):
 
 		
 		self.gmapLayout = QGridLayout()
-		self.gmap = GMapWebView("gmap-drone.html")
+		self.gmap = GMapWebView("gmap-drone.html", self.jsSignal)
 		self.logText = QTextEdit()
 		self.logText.setReadOnly(True)
 		
@@ -89,6 +119,7 @@ class MainFrame(QWidget):
 		self.targetBtn.setIconSize(QSize(130,130))
 
 		self.takeoffBtn.clicked.connect(self.on_takeoff_clicked)
+		self.targetBtn.clicked.connect(self.on_target_clicked)
 
 		# self.gmapLayout.addWidget(self.gmap, 0, 0, 2, 5)
 		# self.gmapLayout.addWidget(self.logText, 1, 4, 1, 1)
@@ -97,7 +128,7 @@ class MainFrame(QWidget):
 
 		self.gmapLayout.addWidget(self.gmap, 0, 0, 3, 6)
 		self.gmapLayout.addWidget(self.droneStatusLayout, 0, 5, 1, 1)
-		self.gmapLayout.addWidget(self.textCommandLayout, 1, 4, 1, 2)
+		self.gmapLayout.addWidget(self.textCommandLayout, 1, 1, 1, 3)
 		self.gmapLayout.addWidget(self.logText, 2, 4, 1, 2)
 		self.gmapLayout.addWidget(self.takeoffBtn, 2, 1, 1, 1)
 		self.gmapLayout.addWidget(self.targetBtn, 2, 2, 1, 1)
@@ -141,7 +172,36 @@ class MainFrame(QWidget):
 		self.resize(2280, 1520)
 
 	def on_takeoff_clicked(self):
-		self.server.send("1", "take off!")
+		command = {
+			"type": "control",
+			"data": {
+				"id": "1",
+				"command": "home",
+				"timestamp": str(datetime.datetime.now()),
+			}
+		}
+		self.server.send("1", json.dumps(command))
+
+		text = "Send takeoff command to drone 1"
+		self.logText.append(text)
+
+	def on_target_clicked(self):
+		if self.context.lat:
+			command = {
+				"type": "control",
+				"data": {
+					"id": "1",
+					"command": "relocation",
+					"lat": self.context.lat,
+					"lng": self.context.lng,
+					"alt": "5",
+					"timestamp": str(datetime.datetime.now()),
+				}
+			}
+			self.server.send("1", json.dumps(command))
+
+			text = "Send relocation command to drone 1"
+			self.logText.append(text)
 
 	def on_map_clicked(self):
 		print "clicked"
@@ -172,6 +232,30 @@ class MainFrame(QWidget):
 		self.server_timer.start(1000)
 
 		self.server.start()
+
+	def js_signal_handler(self, msg_):
+
+
+		msg = str(msg_).split()
+		print msg
+
+		if msg[0] == "marker_click_event":
+			self.context.lat = msg[1]
+			self.context.lng = msg[2]
+			text = "(%s, %s) clicked." % (self.context.lat, self.context.lng)
+			self.logText.append(text)
+
+
+		elif msg[0] == "map_click_event":
+			self.context.lat = msg[1]
+			self.context.lng = msg[2]
+			text = "(%s, %s) clicked." % (self.context.lat, self.context.lng)
+			self.logText.append(text)
+
+			# if not self.commandLayout.is_gcs_location_enabled():
+			# 	self.commandLayout.gcsLocationBtn.setEnabled(True)
+			# 	self.gmap.mark_gcs_position(msg[1], msg[2])
+			# self.commandLayout.set_location(msg[1], msg[2])
 
 	def on_server_timer(self):
 		try:
