@@ -6,10 +6,10 @@ import json
 from VipQueueMsgType import ClientReport
 
 
-class AlexaHandler(BaseHTTPRequestHandler):
+class AlexaHandler(BaseHTTPRequestHandler, object):
 
 	def __init__(self, q):
-		super(MyHandler, self).__init__()
+		# super(AlexaHandler, self).__init__()
 		self._q = q
 
 

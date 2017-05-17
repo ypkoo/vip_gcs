@@ -11,7 +11,7 @@ Pollable Queue http://chimera.labs.oreilly.com/books/1230000000393/ch12.html
 import socket, struct, threading, Queue, select, json, sys, time
 from AlexaServer import AlexaHandler
 from VipQueueMsgType import *
-
+from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 
 
 
@@ -152,14 +152,17 @@ class AlexaServer(threading.Thread):
 	def __init__(self, q):
 		super(AlexaServer, self).__init__()
 		self.alexaHandler = AlexaHandler(q)
-		server = HTTPServer(('', PORT), self.alexaHandler)
-		print('Start server. port:', PORT)
+		self.server = HTTPServer(('', 8000), self.alexaHandler)
+		print('Start server. port:', 8000)
 		self.alive = threading.Event()
 		self.alive.set()
 		
 
-	def run():
-		server.serve_forever()
+	def run(self):
+		try:
+			self.server.serve_forever()
+		except KeyboardInterrupt:
+			print('^C received, shutting down the web server')
 
 
 class GCSSeverThread(threading.Thread):
@@ -200,6 +203,7 @@ class GCSSeverThread(threading.Thread):
 			sys.exit(1)
 
 	def run(self):
+		self.start_alexa_server()
 		while self.alive.isSet():
 			readable, writable, exceptional = select.select(self.pollingList, [], [], 1)
 			for s in readable:
@@ -257,6 +261,8 @@ class GCSSeverThread(threading.Thread):
 							}
 							self.send_to_all(json.dumps(command))
 
+		self.alexaServer.server.shutdown()
+
 
 	def _create_client(self, connection, q):
 		client = DroneClientThread(connection, q, self.send_to_all)
@@ -274,6 +280,13 @@ class GCSSeverThread(threading.Thread):
 			if not drone.isM600:
 				drone.send(msg)
 
+	def start_alexa_server(self):
+		self.alexaServer = AlexaServer(self.clientReportQueue)
+		self.alexaServer.start()
+
+	""" TODO """
+	def server_close(self):
+		pass
 
 
 if __name__ == "__main__":
