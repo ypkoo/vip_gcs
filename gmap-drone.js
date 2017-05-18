@@ -11,6 +11,8 @@ var lineList = [];
 // 	'yellow': 'http://localhost:8000/map-icons/icon-gcs2-blue.png'
 // }
 
+var MAN = true
+
 var icons_url = {
 	'home': 'map-icons/icon-gcs2-home.png',
 	'idle': 'map-icons/icon-gcs2-blue.png',
@@ -75,8 +77,10 @@ function update_marker(id, lat, lng) {
 			map: map
 		});
 
-		if (id == "1")
-			marker.setIcon(icons_url['man-yellow']);
+		if (id == "1") {
+			MAN ? marker.setIcon(icons_url['man-yellow']) : marker.setIcon(icons_url['red']);
+			
+		}
 
 		marker.addListener('click', function() {
 			markerPos = marker.getPosition()

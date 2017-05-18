@@ -8,6 +8,9 @@ from GCSServer import *
 import sys, os, time, signal, json, datetime
 from aqua.qsshelper import QSSHelper
 
+HOST = ""
+PORT = 43212
+
 def LOG(logger_, text):
 	logger = "[ "+logger_+" ]"
 	return "%s %s" % (logger, text)
@@ -276,7 +279,7 @@ class MainFrame(QWidget):
 
 	def gcs_server_init(self):
 		self.logText.append(LOG("GCS", "Connecting to the server..."))
-		self.server = GCSSeverThread("127.0.0.1", 43212)
+		self.server = GCSSeverThread(HOST, PORT)
 
 		""" Server timer init """
 		self.server_timer = QTimer(self)
@@ -294,20 +297,17 @@ class MainFrame(QWidget):
 		if msg[0] == "marker_click_event":
 			self.context.lat = msg[1]
 			self.context.lng = msg[2]
-			text = "(%s, %s) clicked." % (self.context.lat, self.context.lng)
-			self.logText.append(text)
+			text = "(%s, %s) clicked." % (self.context.lat[:-5], self.context.lng[:-5])
+			self.logText.append(LOG("GUI", text))
 
 
 		elif msg[0] == "map_click_event":
 			self.context.lat = msg[1]
 			self.context.lng = msg[2]
-			text = "(%s, %s) clicked." % (self.context.lat, self.context.lng)
-			self.logText.append(text)
+			text = "(%s, %s) clicked." % (self.context.lat[:-10], self.context.lng[:-10])
+			self.logText.append(LOG("GUI", text))
 
-			# if not self.commandLayout.is_gcs_location_enabled():
-			# 	self.commandLayout.gcsLocationBtn.setEnabled(True)
-			# 	self.gmap.mark_gcs_position(msg[1], msg[2])
-			# self.commandLayout.set_location(msg[1], msg[2])
+
 
 	def on_server_timer(self):
 		try:
@@ -317,7 +317,6 @@ class MainFrame(QWidget):
 
 				
 			elif serverReport.type == ServerReport.NEW:
-				# self.logText.append(serverReport.data)
 				self.logText.append(LOG("Server", 'A new drone %s is connected.' % serverReport.data))
 				if serverReport.data == "1":
 					self.context.isM600Connected = True
