@@ -57,7 +57,8 @@ function map_clicked(e) {
 // creates a new marker if the id is not recognized
 function update_marker(id, lat, lng) {
 	console.log("update marker!");
-	if (id in drone_dict) {
+
+	if (id in drone_dict && drone_dict[id] != null) {
 		var marker = drone_dict[id];
 		marker.setPosition({lat: lat, lng: lng});
 	} 
