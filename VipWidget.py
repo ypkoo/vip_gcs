@@ -141,13 +141,15 @@ class VipDroneStatus(QWidget):
 		self.setStyleSheet("""
 			background-color: rgba(0, 0, 0, 50%);
 			border-radius: 20px;
-			color: white;""")
+			color: yellow;""")
 
 	def setStatus(self, info):
 		text = """Drone %s
+		
 lat: %s
 lng: %s
-alt: %s""" % (info['id'], info['location']['lat'], info['location']['lng'], info['location']['alt'])
+alt: %s
+""" % (info['id'], info['location']['lat'], info['location']['lng'], info['location']['alt'])
 
 		self.statusText.setText(text)
 		

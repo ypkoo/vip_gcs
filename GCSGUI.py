@@ -8,6 +8,9 @@ from GCSServer import *
 import sys, os, time, signal, json, datetime
 from aqua.qsshelper import QSSHelper
 
+def LOG(logger_, text):
+	logger = "[ "+logger_+" ]"
+	return "%s %s" % (logger, text)
 
 class JSCommunicator(QObject):
 	def __init__(self, signal):
@@ -44,10 +47,11 @@ class VipContext(object):
 		curLat = None
 		curLng = None
 		curAlt = None
-
 		m600Lat = None
 		m600Lng = None
 		m600Alt = None
+
+		self.isM600Connected = False
 
 class MainFrame(QWidget):
 
@@ -165,7 +169,7 @@ class MainFrame(QWidget):
 		self.gmapLayout.setColumnStretch(2, 1)
 		self.gmapLayout.setColumnStretch(3, 1)
 		self.gmapLayout.setColumnStretch(4, 2)
-		self.gmapLayout.setColumnStretch(5, 2)
+		self.gmapLayout.setColumnStretch(5, 1)
 		self.gmapLayout.setRowStretch(0, 6)
 		self.gmapLayout.setRowStretch(1, 1)
 		self.gmapLayout.setRowStretch(2, 2)
@@ -201,7 +205,7 @@ class MainFrame(QWidget):
 		self.resize(2280, 1520)
 
 	def on_takeoff_clicked(self):
-		if context.m600Lat:
+		if self.context.isM600Connected:
 			command = {
 				"type": "control",
 				"data": {
@@ -214,11 +218,10 @@ class MainFrame(QWidget):
 			}
 			self.server.send_to_all(json.dumps(command))
 
-			text = "Send start command to drones"
-			self.logText.append(text)
+			self.logText.append(LOG("GUI", "Send start command to drones"))
 
 	def on_target_clicked(self):
-		if context.m600Lat:
+		if self.context.isM600Connected:
 			command = {
 				"type": "control",
 				"data": {
@@ -231,11 +234,10 @@ class MainFrame(QWidget):
 			}
 			self.server.send_to_all(json.dumps(command))
 
-			text = "Send go command to drone 1"
-			self.logText.append(text)
+			self.logText.append(LOG("GUI", "Send start go to drones"))
 
 	def on_stop_clicked(self):
-		if context.m600Lat:
+		if self.context.isM600Connected:
 			command = {
 				"type": "control",
 				"data": {
@@ -248,8 +250,7 @@ class MainFrame(QWidget):
 			}
 			self.server.send_to_all(json.dumps(command))
 
-			text = "Send stop command to drone 1"
-			self.logText.append(text)
+			self.logText.append(LOG("GUI", "Send start stop to drones"))
 
 	def on_map_clicked(self):
 		self.stackedLayout.setCurrentIndex(0)
@@ -274,7 +275,7 @@ class MainFrame(QWidget):
 
 
 	def gcs_server_init(self):
-		self.logText.append("Connecting to the server...")
+		self.logText.append(LOG("GCS", "Connecting to the server..."))
 		self.server = GCSSeverThread("127.0.0.1", 43212)
 
 		""" Server timer init """
@@ -312,17 +313,21 @@ class MainFrame(QWidget):
 		try:
 			serverReport = self.server.serverReportQueue.get_nowait()
 			if serverReport.type == ServerReport.TEXT:
-				self.logText.append(serverReport.data)
+				self.logText.append(LOG("Server", serverReport.data))
 
 				
 			elif serverReport.type == ServerReport.NEW:
 				# self.logText.append(serverReport.data)
-				self.logText.append('A new drone %s is connected.' % serverReport.data)
+				self.logText.append(LOG("Server", 'A new drone %s is connected.' % serverReport.data))
+				if serverReport.data == "1":
+					self.context.isM600Connected = True
 				self.droneStatusLayout.add(serverReport.data)
 			elif serverReport.type == ServerReport.TERMINATE:
 				self.gmap.frame.evaluateJavaScript('remove_marker(%s)' % serverReport.data)
 				self.droneStatusLayout.remove(serverReport.data)
-				self.logText.append('Drone %s connection closed.' % serverReport.data)
+				self.logText.append(LOG("Server", 'Drone %s connection closed.' % serverReport.data))
+			elif serverReport.type == ServerReport.ALEXA:
+				self.logText.append(LOG("Alexa", serverReport.data))
 
 		except Queue.Empty as e:
 			pass

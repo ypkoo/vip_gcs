@@ -195,7 +195,7 @@ class GCSSeverThread(threading.Thread):
 			self.socket.bind((host, port))
 			self.socket.listen(5)
 			self.pollingList.append(self.socket)
-			self.serverReportQueue.put(ServerReport(ServerReport.TEXT, "Server is initiated successfully."))
+			self.serverReportQueue.put(ServerReport(ServerReport.TEXT, "Server initiated successfully."))
 
 		except socket.error, msg:
 			text = "Couldn't connect with the socket-server: %s\n terminating server" % msg
@@ -204,6 +204,7 @@ class GCSSeverThread(threading.Thread):
 
 	def run(self):
 		self.start_alexa_server()
+		self.serverReportQueue.put(ServerReport(ServerReport.ALEXA, "Alexa initiated successfully."))
 		while self.alive.isSet():
 			readable, writable, exceptional = select.select(self.pollingList, [], [], 1)
 			for s in readable:
@@ -246,6 +247,7 @@ class GCSSeverThread(threading.Thread):
 								}
 							}
 							self.send_to_all(json.dumps(command))
+							self.serverReportQueue.put(ServerReport(ServerReport.ALEXA, "Send start stop to drones"))
 						elif msg.data == "go":
 							command = {
 								"type": "control",
@@ -258,6 +260,7 @@ class GCSSeverThread(threading.Thread):
 								}
 							}
 							self.send_to_all(json.dumps(command))
+							self.serverReportQueue.put(ServerReport(ServerReport.ALEXA, "Send go stop to drones"))
 						elif msg.data == "stop":
 							command = {
 								"type": "control",
@@ -270,6 +273,7 @@ class GCSSeverThread(threading.Thread):
 								}
 							}
 							self.send_to_all(json.dumps(command))
+							self.serverReportQueue.put(ServerReport(ServerReport.ALEXA, "Send stop stop to drones"))
 
 		self.alexaServer.server.shutdown()
 

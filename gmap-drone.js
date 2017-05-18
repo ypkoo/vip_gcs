@@ -16,7 +16,8 @@ var icons_url = {
 	'idle': 'map-icons/icon-gcs2-blue.png',
 	'tracking' : 'map-icons/icon-gcs2-green.png',
 	'red': 'map-icons/icon-gcs2-red.png',
-	'yellow': 'map-icons/icon-gcs2-blue.png'
+	'yellow': 'map-icons/icon-gcs2-blue.png',
+	'man-yellow': 'map-icons/person-walking-white.png'
 }
 
 // Initialize the map. Called when this file is loaded.
@@ -25,7 +26,7 @@ function initMap() {
 
 	map = new google.maps.Map(document.getElementById('map'), {
 		center: GCSLatLng,
-		zoom: 17,
+		zoom: 18,
 		mapTypeId: google.maps.MapTypeId.SATELLITE,
 		disableDefaultUI: true
 	});
@@ -75,7 +76,7 @@ function update_marker(id, lat, lng) {
 		});
 
 		if (id == "1")
-			marker.setIcon(icons_url['red']);
+			marker.setIcon(icons_url['man-yellow']);
 
 		marker.addListener('click', function() {
 			markerPos = marker.getPosition()

@@ -23,7 +23,7 @@ class ClientReport(object):
 
 class ServerReport(object):
 
-	NEW, TEXT, TERMINATE = range(3)
+	NEW, TEXT, TERMINATE, ALEXA = range(4)
 
 	def __init__(self, type_, data=None):
 		self.type = type_
