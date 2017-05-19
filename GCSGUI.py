@@ -237,7 +237,7 @@ class MainFrame(QWidget):
 			}
 			self.server.send_to_all(json.dumps(command))
 
-			self.logText.append(LOG("GUI", "Send start go to drones"))
+			self.logText.append(LOG("GUI", "Send go command to drones"))
 
 	def on_stop_clicked(self):
 		if self.context.isM600Connected:
@@ -253,7 +253,7 @@ class MainFrame(QWidget):
 			}
 			self.server.send_to_all(json.dumps(command))
 
-			self.logText.append(LOG("GUI", "Send start stop to drones"))
+			self.logText.append(LOG("GUI", "Send stop command to drones"))
 
 	def on_map_clicked(self):
 		self.stackedLayout.setCurrentIndex(0)
@@ -334,7 +334,7 @@ class MainFrame(QWidget):
 
 		for drone in self.server.droneList:
 			info = drone.drone.get_info()
-			print info
+			# print info
 
 			if info['id'] == "1":
 				self.context.m600Lat = info['location']['lat']

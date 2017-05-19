@@ -3,6 +3,9 @@ var gcsMarker;
 var drone_dict = {};
 var lineList = [];
 
+var groundGPS = {lat: 36.3695544, lng: 127.368479};
+var N1GPS = {lat: 36.374092, lng: 127.365638};
+
 // var icons_url = {
 // 	'home': 'http://localhost:8000/map-icons/icon-gcs2-home.png',
 // 	'idle': 'http://localhost:8000/map-icons/icon-gcs2-blue.png',
@@ -24,11 +27,11 @@ var icons_url = {
 
 // Initialize the map. Called when this file is loaded.
 function initMap() {
-	var GCSLatLng = {lat: 36.374092, lng: 127.365638};
+	var GCSLatLng = groundGPS;
 
 	map = new google.maps.Map(document.getElementById('map'), {
 		center: GCSLatLng,
-		zoom: 18,
+		zoom: 19,
 		mapTypeId: google.maps.MapTypeId.SATELLITE,
 		disableDefaultUI: true
 	});

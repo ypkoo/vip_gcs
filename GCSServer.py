@@ -153,7 +153,7 @@ class AlexaServer(threading.Thread):
 		super(AlexaServer, self).__init__()
 		self.alexaHandler = make_alexa_handler_class(q)
 		self.server = HTTPServer(('', 8000), self.alexaHandler)
-		print('Start server. port:', 8000)
+		# print('Start server. port:', 8000)
 		self.alive = threading.Event()
 		self.alive.set()
 		
@@ -247,7 +247,7 @@ class GCSSeverThread(threading.Thread):
 								}
 							}
 							self.send_to_all(json.dumps(command))
-							self.serverReportQueue.put(ServerReport(ServerReport.ALEXA, "Send start stop to drones"))
+							self.serverReportQueue.put(ServerReport(ServerReport.ALEXA, "Send start command to drones"))
 						elif msg.data == "go":
 							command = {
 								"type": "control",
@@ -260,7 +260,7 @@ class GCSSeverThread(threading.Thread):
 								}
 							}
 							self.send_to_all(json.dumps(command))
-							self.serverReportQueue.put(ServerReport(ServerReport.ALEXA, "Send go stop to drones"))
+							self.serverReportQueue.put(ServerReport(ServerReport.ALEXA, "Send go command to drones"))
 						elif msg.data == "stop":
 							command = {
 								"type": "control",
@@ -273,7 +273,7 @@ class GCSSeverThread(threading.Thread):
 								}
 							}
 							self.send_to_all(json.dumps(command))
-							self.serverReportQueue.put(ServerReport(ServerReport.ALEXA, "Send stop stop to drones"))
+							self.serverReportQueue.put(ServerReport(ServerReport.ALEXA, "Send stop command to drones"))
 
 		self.alexaServer.server.shutdown()
 

@@ -28,7 +28,7 @@ class DroneSim(threading.Thread):
 			# time.sleep(10)
 			self.s.send(json.dumps(data))
 			# recv_data = self.s.recv(2048)
-			print "data sent: ", data
+			# print "data sent: ", data
 			ready = select.select([self.s], [], [], 0.1)
 			if ready[0]:
 				recv_data = self.s.recv(2048)
