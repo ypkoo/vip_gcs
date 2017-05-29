@@ -163,9 +163,11 @@ class MainFrame(QWidget):
 		self.gmapLayout.addWidget(self.droneStatusLayout, 0, 5, 2, 1)
 		# self.gmapLayout.addWidget(self.textCommandLayout, 1, 1, 1, 3)
 		self.gmapLayout.addWidget(self.logText, 2, 4, 1, 2)
+		""" Buttons
 		self.gmapLayout.addWidget(self.takeoffBtn, 2, 1, 1, 1)
 		self.gmapLayout.addWidget(self.targetBtn, 2, 2, 1, 1)
 		self.gmapLayout.addWidget(self.stopBtn, 2, 3, 1, 1)
+		"""
 
 		self.gmapLayout.setColumnStretch(0, 1)
 		self.gmapLayout.setColumnStretch(1, 1)
