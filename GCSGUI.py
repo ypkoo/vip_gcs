@@ -9,7 +9,7 @@ import sys, os, time, signal, json, datetime
 from aqua.qsshelper import QSSHelper
 
 HOST = ""
-PORT = 43212
+PORT = 43211
 
 def LOG(logger_, text):
 	logger = "[ "+logger_+" ]"
@@ -284,8 +284,11 @@ class MainFrame(QWidget):
 	def on_textcommandbtn_clicked(self):
 		textCommand = str(self.textCommand.toPlainText())
 		command = {
-				"type": "textcommand",
-				"data": textCommand,
+				"type": "dronemanager",
+				"data": {
+							"command": "textcommand",
+							"contents": textCommand, 
+						}
 			}
 		self.server.send(self.context.curSelected, json.dumps(command))
 		text = "Send text command %s to drone %s" % (textCommand, self.context.curSelected)
