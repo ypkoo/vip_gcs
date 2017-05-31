@@ -105,12 +105,6 @@ class MainFrame(QWidget):
 		self.gmapLayout = QGridLayout()
 		self.gmap = GMapWebView("gmap-drone.html", self.jsSignal)
 
-		fontDB = QFontDatabase()
-		latoLight = fontDB.addApplicationFont("fonts/Lato/Lato-Light.ttf")
-		if latoLight < 0:
-			print "font load failed"
-		latoLightFont = fontDB.font("fonts/Lato/Lato-Light.ttf", "normal", 12)
-
 
 		self.logText = QTextEdit()
 		self.logText.setReadOnly(True)
@@ -156,8 +150,10 @@ class MainFrame(QWidget):
 		self.droneInfo.setLayout(self.droneInfoLayout)
 		self.textCommand = QTextEdit()
 		self.textCommandBtn = QPushButton("send")
-		self.droneInfoLayout.addWidget(self.textCommand, 0, 0)
-		self.droneInfoLayout.addWidget(self.textCommandBtn, 0, 1)
+		self.curDroneLabel = QLabel()
+		self.droneInfoLayout.addWidget(self.curDroneLabel, 0, 0)
+		self.droneInfoLayout.addWidget(self.textCommand, 1, 0)
+		self.droneInfoLayout.addWidget(self.textCommandBtn, 1, 1)
 		self.textCommandBtn.clicked.connect(self.on_textcommandbtn_clicked)
 
 		
@@ -329,6 +325,7 @@ class MainFrame(QWidget):
 
 	def on_dronestatus_clicked(self, id_):
 		self.context.curSelected = id_
+		self.curDroneLabel.setText("Drone %s" % id_)
 		print "%s clicked!" % id_
 		self.cmdWidget.show()
 
