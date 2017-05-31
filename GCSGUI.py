@@ -262,7 +262,25 @@ class MainFrame(QWidget):
 		self.logText.append(LOG("GUI", "Send relocation command to drone %s" % self.context.curSelected))
 
 	def on_streamingbtn_clicked(self):
-		pass
+		port = "5000%s" % self.context.curSelected
+		drone = self.server.drone_by_id(self.context.curSelected)
+		if drone.drone.stream == "on":
+			action = "off"
+		else:
+			action = "on"
+
+		command = {
+			"type": "dronemanager",
+			"data": {
+				"command": "stream",
+				"port": port,
+				"quality": "high",
+				"action": action,
+			}
+		}
+		self.server.send(self.context.curSelected, json.dumps(command))
+
+		self.logText.append(LOG("GUI", "Send stream %s command to drone %s" % (action, self.context.curSelected)))
 
 	def on_function1btn_clicked(self):
 		pass
@@ -328,7 +346,8 @@ class MainFrame(QWidget):
 
 	def on_dronestatus_clicked(self, id_):
 		self.context.curSelected = id_
-		self.curDroneLabel.setText("Drone %s" % id_)
+		drone = self.server.drone_by_id(id_)
+		self.curDroneLabel.setText("Drone %s stream: %s" % (id_, drone.drone.stream))
 		print "%s clicked!" % id_
 		self.cmdWidget.show()
 
