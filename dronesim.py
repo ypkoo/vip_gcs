@@ -22,6 +22,13 @@ class DroneSim(threading.Thread):
 					"lat": str(36.374092 + random.randrange(1, 10)*0.0001),
 					"lng": str(127.365638 + random.randrange(1, 10)*0.0001),
 					"alt": str(random.randrange(1, 10)),
+					"activate": "on",
+					"stream": "off",
+					"battery": "95",
+					"yaw": "45.0",
+					"track": "off",
+					"state": "ready",
+					"image": "off",
 					"lastUpdate": str(datetime.datetime.now()),
 				},
 			}

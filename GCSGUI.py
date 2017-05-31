@@ -53,6 +53,7 @@ class VipContext(object):
 		m600Lat = None
 		m600Lng = None
 		m600Alt = None
+		curSelected = None
 
 		self.isM600Connected = False
 
@@ -95,17 +96,8 @@ class MainFrame(QWidget):
 		self.navBar.add_btn(self.streamingBtn)
 
 		self.droneStatusLayout = VipStatusLayout()
-		# self.droneStatusLable1 = QLabel()
-		# self.droneStatusLable2 = QLabel()
-		# self.droneStatusLable1.setWordWrap(True)
-		# self.droneStatusLable1.setText("testtestseaaaaaaaaaaaaaaaaaaa\natasdfasdfl;aksdjf;laskdjfl;askdf")
-		# self.droneStatusLayout.add(self.droneStatusLable1)
-		# self.droneStatusLayout.add(self.droneStatusLable2)
 
-		self.textCommandLayout = VipTextCommandLayout()
-		self.textCommandLayout.commandBtn.clicked.connect(self.on_textcommand_clicked)
 
-		
 		self.streamingBtn.clicked.connect(self.on_streaming_clicked)
 		self.mapBtn.clicked.connect(self.on_map_clicked)
 
@@ -118,17 +110,10 @@ class MainFrame(QWidget):
 		if latoLight < 0:
 			print "font load failed"
 		latoLightFont = fontDB.font("fonts/Lato/Lato-Light.ttf", "normal", 12)
-		# if not latoLight == -1:
-		# 	print "font load successed"
-		# 	fontDB = QFontDatabase()
-		# 	self.fontStyles = fontDB.styles('LatoLight')
-		# 	self.fontFamilies = QFontDatabase.applicationFontFamilies(latoLight)
-		# 	for fontFamily in self.fontFamilies:
-		# 		self.font = fontDB.font(fontFamily, self.fontStyles.first(), 24)
+
 
 		self.logText = QTextEdit()
 		self.logText.setReadOnly(True)
-		# self.logText.setFont(latoLightFont)
 		
 		self.logText.setStyleSheet("""
 			background-color:rgba(0, 0, 0, 50%);
@@ -140,34 +125,75 @@ class MainFrame(QWidget):
 			border-color: white;
 			border-radius: 20px;""")
 
-		self.takeoffBtn = QPushButton("")
-		self.takeoffBtn.setIcon(QIcon('image/takoff.png'))
-		self.takeoffBtn.setIconSize(QSize(130,130))
-		self.targetBtn = QPushButton("")
-		self.targetBtn.setIcon(QIcon('image/target.png'))
-		self.targetBtn.setIconSize(QSize(130,130))
-		self.stopBtn = QPushButton("")
-		self.stopBtn.setIcon(QIcon('image/target.png'))
-		self.stopBtn.setIconSize(QSize(130,130))
 
-		self.takeoffBtn.clicked.connect(self.on_takeoff_clicked)
-		self.targetBtn.clicked.connect(self.on_target_clicked)
-		self.stopBtn.clicked.connect(self.on_stop_clicked)
 
-		# self.gmapLayout.addWidget(self.gmap, 0, 0, 2, 5)
-		# self.gmapLayout.addWidget(self.logText, 1, 4, 1, 1)
-		# self.gmapLayout.addWidget(self.takeoffBtn, 1, 1, 1, 1)
-		# self.gmapLayout.addWidget(self.targetBtn, 1, 2, 1, 1)
+		""" Command layout """
+		self.cmdWidget = QWidget()
+		# self.cmdWidget.hide()
+		self.cmdWidget.setStyleSheet("background-color:rgba(0, 0, 0, 0%);")
+		self.cmdLayout = QGridLayout()
+		# self.cmdLayout.setSpacing(0)
+		self.cmdLayout.setContentsMargins(0,0,0,0)
+		self.cmdWidget.setLayout(self.cmdLayout)
+		
+		self.droneIDLabel = QLabel()
+		self.takeoffBtn = VipCommandBtn("Take Off")
+		self.landBtn = VipCommandBtn("Land")
+		self.relocationBtn = VipCommandBtn("Relocation")
+		self.streamingBtn = VipCommandBtn("Streaming")
+		self.function1Btn = VipCommandBtn("Function 1")
+		self.function2Btn = VipCommandBtn("Function 2")
+
+		self.droneInfo = QWidget()
+		self.droneInfo.setStyleSheet("""
+			background-color:rgba(0, 0, 0, 50%);
+			color: white;
+			margin-left: 10px;
+			margin-bottom: 10px;
+			border: 1px solid white;
+			border-radius: 20px;""")
+		self.droneInfoLayout = QGridLayout()
+		self.droneInfo.setLayout(self.droneInfoLayout)
+		self.textCommand = QTextEdit()
+		self.textCommandBtn = QPushButton("send")
+		self.droneInfoLayout.addWidget(self.textCommand, 0, 0)
+		self.droneInfoLayout.addWidget(self.textCommandBtn, 0, 1)
+		self.textCommandBtn.clicked.connect(self.on_textcommandbtn_clicked)
+
+		
+
+		# self.cmdLayout.addWidget(self.droneIDLabel, 0, 0, 1, 1)
+		self.cmdLayout.addWidget(self.droneInfo, 0, 0, 2, 1)
+		self.cmdLayout.addWidget(self.takeoffBtn, 0, 1, 1, 1)
+		self.cmdLayout.addWidget(self.landBtn, 1, 1, 1, 1)
+		self.cmdLayout.addWidget(self.relocationBtn, 0, 2, 1, 1)
+		self.cmdLayout.addWidget(self.streamingBtn, 0, 3, 1, 1)
+		self.cmdLayout.addWidget(self.function1Btn, 0, 4, 1, 1)
+		self.cmdLayout.addWidget(self.function2Btn, 1, 4, 1, 1)
+
+		self.takeoffBtn.clicked.connect(self.on_takeoffbtn_clicked)
+		self.landBtn.clicked.connect(self.on_landbtn_clicked)
+		self.relocationBtn.clicked.connect(self.on_relocationbtn_clicked)
+		self.streamingBtn.clicked.connect(self.on_streamingbtn_clicked)
+		self.function1Btn.clicked.connect(self.on_function1btn_clicked)
+		self.function2Btn.clicked.connect(self.on_function2btn_clicked)
+
+		# self.cmdLayout.setRowStretch(0, 2)
+		# self.cmdLayout.setRowStretch(1, 10)
+		self.cmdLayout.setColumnStretch(0, 5)
+		self.cmdLayout.setColumnStretch(1, 2)
+		self.cmdLayout.setColumnStretch(2, 2)
+		self.cmdLayout.setColumnStretch(3, 2)
+		self.cmdLayout.setColumnStretch(4, 2)
+
+
 
 		self.gmapLayout.addWidget(self.gmap, 0, 0, 3, 6)
 		self.gmapLayout.addWidget(self.droneStatusLayout, 0, 5, 2, 1)
 		# self.gmapLayout.addWidget(self.textCommandLayout, 1, 1, 1, 3)
+		self.gmapLayout.addWidget(self.cmdWidget, 2, 0, 1, 4)
 		self.gmapLayout.addWidget(self.logText, 2, 4, 1, 2)
-		""" Buttons
-		self.gmapLayout.addWidget(self.takeoffBtn, 2, 1, 1, 1)
-		self.gmapLayout.addWidget(self.targetBtn, 2, 2, 1, 1)
-		self.gmapLayout.addWidget(self.stopBtn, 2, 3, 1, 1)
-		"""
+
 
 		self.gmapLayout.setColumnStretch(0, 1)
 		self.gmapLayout.setColumnStretch(1, 1)
@@ -177,16 +203,9 @@ class MainFrame(QWidget):
 		self.gmapLayout.setColumnStretch(5, 1)
 		self.gmapLayout.setRowStretch(0, 6)
 		self.gmapLayout.setRowStretch(1, 1)
-		self.gmapLayout.setRowStretch(2, 2)
+		self.gmapLayout.setRowStretch(2, 1)
 		
 
-		# self.gmapLayout.setColumnStretch(0, 1)
-		# self.gmapLayout.setColumnStretch(1, 1)
-		# self.gmapLayout.setColumnStretch(2, 1)
-		# self.gmapLayout.setColumnStretch(3, 1)
-		# self.gmapLayout.setColumnStretch(4, 2)
-		# self.gmapLayout.setRowStretch(0, 3)
-		# self.gmapLayout.setRowStretch(1, 1)
 		self.gmapWidget = QWidget()
 		self.gmapWidget.setLayout(self.gmapLayout)
 		self.stackedLayout.addWidget(self.gmapWidget)
@@ -209,53 +228,51 @@ class MainFrame(QWidget):
 		self.setLayout(self.gridLayout)
 		self.resize(2280, 1520)
 
-	def on_takeoff_clicked(self):
-		if self.context.isM600Connected:
-			command = {
-				"type": "control",
-				"data": {
-					"command": "start",
-					"lat": self.context.m600Lat,
-					"lng": self.context.m600Lng,
-					"alt": self.context.m600Alt,
-					"timestamp": str(datetime.datetime.now()),
-				}
+	def on_takeoffbtn_clicked(self):
+		command = {
+			"type": "control",
+			"data": {
+				"command": "takeoff",
 			}
-			self.server.send_to_all(json.dumps(command))
+		}
+		self.server.send(self.context.curSelected, json.dumps(command))
 
-			self.logText.append(LOG("GUI", "Send start command to drones"))
+		self.logText.append(LOG("GUI", "Send takeoff command to drone %s" % self.context.curSelected))
 
-	def on_target_clicked(self):
-		if self.context.isM600Connected:
-			command = {
-				"type": "control",
-				"data": {
-					"command": "go",
-					"lat": self.context.m600Lat,
-					"lng": self.context.m600Lng,
-					"alt": self.context.m600Alt,
-					"timestamp": str(datetime.datetime.now()),
-				}
+	def on_landbtn_clicked(self):
+		command = {
+			"type": "control",
+			"data": {
+				"command": "land",
 			}
-			self.server.send_to_all(json.dumps(command))
+		}
+		self.server.send(self.context.curSelected, json.dumps(command))
 
-			self.logText.append(LOG("GUI", "Send go command to drones"))
+		self.logText.append(LOG("GUI", "Send land command to drone %s" % self.context.curSelected))
 
-	def on_stop_clicked(self):
-		if self.context.isM600Connected:
-			command = {
-				"type": "control",
-				"data": {
-					"command": "stop",
-					"lat": self.context.m600Lat,
-					"lng": self.context.m600Lng,
-					"alt": self.context.m600Alt,
-					"timestamp": str(datetime.datetime.now()),
-				}
+	def on_relocationbtn_clicked(self):
+		command = {
+			"type": "control",
+			"data": {
+				"command": "relocate",
+				"lat": "",
+				"lng": "",
+				"alt": "",
+				"yaw": "",
 			}
-			self.server.send_to_all(json.dumps(command))
+		}
+		self.server.send(self.context.curSelected, json.dumps(command))
 
-			self.logText.append(LOG("GUI", "Send stop command to drones"))
+		self.logText.append(LOG("GUI", "Send relocation command to drone %s" % self.context.curSelected))
+
+	def on_streamingbtn_clicked(self):
+		pass
+
+	def on_function1btn_clicked(self):
+		pass
+
+	def on_function2btn_clicked(self):
+		pass
 
 	def on_map_clicked(self):
 		self.stackedLayout.setCurrentIndex(0)
@@ -268,14 +285,14 @@ class MainFrame(QWidget):
 		self.mapBtn.raise_()
 		self.streamingBtn.raise_()
 
-	def on_textcommand_clicked(self):
-		textCommand = str(self.textCommandLayout.commandText.toPlainText())
+	def on_textcommandbtn_clicked(self):
+		textCommand = str(self.textCommand.toPlainText())
 		command = {
 				"type": "textcommand",
 				"data": textCommand,
 			}
-		self.server.send("1", json.dumps(command))
-		text = "Send text command %s to drone 1" % textCommand
+		self.server.send(self.context.curSelected, json.dumps(command))
+		text = "Send text command %s to drone %s" % (textCommand, self.context.curSelected)
 		self.logText.append(text)
 
 
@@ -308,6 +325,12 @@ class MainFrame(QWidget):
 			self.context.lng = msg[2]
 			text = "(%s, %s) clicked." % (self.context.lat[:-10], self.context.lng[:-10])
 			self.logText.append(LOG("GUI", text))
+			self.cmdWidget.hide()
+
+	def on_dronestatus_clicked(self, id_):
+		self.context.curSelected = id_
+		print "%s clicked!" % id_
+		self.cmdWidget.show()
 
 
 
@@ -322,10 +345,11 @@ class MainFrame(QWidget):
 				self.logText.append(LOG("Server", 'A new drone %s is connected.' % serverReport.data))
 				if serverReport.data == "1":
 					self.context.isM600Connected = True
-				self.droneStatusLayout.add(serverReport.data)
+				self.droneStatusLayout.addWidget(serverReport.data)
+				self.droneStatusLayout.clicked_connect(serverReport.data, self.on_dronestatus_clicked)
 			elif serverReport.type == ServerReport.TERMINATE:
 				self.gmap.frame.evaluateJavaScript('remove_marker(%s)' % serverReport.data)
-				self.droneStatusLayout.remove(serverReport.data)
+				self.droneStatusLayout.removeWidget(serverReport.data)
 				self.logText.append(LOG("Server", 'Drone %s connection closed.' % serverReport.data))
 			elif serverReport.type == ServerReport.ALEXA:
 				self.logText.append(LOG("Alexa", serverReport.data))

@@ -51,11 +51,15 @@ class Drone(object):
 		self.lat = None
 		self.lng = None
 		self.alt = None
+		self.yaw = None
 
 		""" Status Flags """
-		self.isFlying = None
-		self.isTracking = None
-		self.isLocating = None
+		self.activate = None
+		self.stream = None
+		self.battery = None
+		self.track = None
+		self.state = None
+		self.image = None
 
 		self.lastUpdate = None
 
@@ -66,9 +70,13 @@ class Drone(object):
 		info = {
 			'id': self.id,
 			'location': {'lat': self.lat, 'lng': self.lng, 'alt': self.alt},
-			'isFlying': self.isFlying,
-			'isTracking': self.isTracking,
-			'isLocating': self.isLocating,
+			'yaw': self.yaw,
+			'stream': self.stream,
+			'battery': self.battery,
+			'track': self.track,
+			'state': self.state,
+			'image': self.image,
+			'activate': self.activate,
 			'lastUpdate': self.lastUpdate,
 		}
 
@@ -129,10 +137,27 @@ class DroneClientThread(threading.Thread):
 
 	def _update_drone(self, data):
 		if data["type"] == "status":
-			self.drone.lat = data["data"]["lat"]
-			self.drone.lng = data["data"]["lng"]
-			self.drone.alt = data["data"]["alt"]
-			self.drone.lastUpdate = data["data"]["lastUpdate"]
+			
+			self.drone.activate = data["data"]["activate"]
+			self.drone.stream = data["data"]["stream"]
+			self.drone.track = data["data"]["track"]
+			self.drone.state = data["data"]["state"]
+			self.drone.image = data["data"]["image"]
+ 			self.drone.lastUpdate = data["data"]["lastUpdate"]
+
+ 			if data["data"]["activate"] == "on":
+ 				self.drone.lat = data["data"]["lat"]
+ 				self.drone.lng = data["data"]["lng"]
+ 				self.drone.alt = data["data"]["alt"]
+ 				self.drone.yaw = data["data"]["yaw"]
+ 				self.drone.battery = data["data"]["battery"]
+ 			else:
+ 				self.drone.lat = None
+ 				self.drone.lng = None
+ 				self.drone.alt = None
+ 				self.drone.yaw = None
+ 				self.drone.battery = None
+
 		if data["type"] == "reply":
 			self.drone.reply = data["reply"]
 

@@ -92,13 +92,26 @@ class VipStatusLayout(QWidget):
 		self.setLayout(self._layout)
 		# self.setMouseTracking(True)
 
-	def add(self, id_):
+	def addWidget(self, id_):
 		# self._btnList.append(btn)
+
 		status = VipDroneStatus(id_)
 		self._droneStatusList.append(status)
-		self._layout.addWidget(status)
 
-	def remove(self, id_):
+		""" Insert a widget in order """
+		if self._layout.count() > 0:
+			for i in range(self._layout.count()):
+				if int(id_) < int(self._layout.itemAt(i).widget().id):
+					self._layout.insertWidget(i, status)
+					break
+				if i == self._layout.count() - 1:
+					self._layout.addWidget(status)
+		else:
+			self._layout.addWidget(status)
+
+
+		
+	def removeWidget(self, id_):
 		for droneStatus in self._droneStatusList:
 			if droneStatus.id == id_:
 				toRemove = droneStatus
@@ -113,13 +126,18 @@ class VipStatusLayout(QWidget):
 		status:
 	"""
 	def setStatus(self, info):
-		for droneStatus in self._droneStatusList:
-			if droneStatus.id == info['id']:
-				target = droneStatus
-				print "find!"
-				break
 
+		target = self._drone_by_id(info['id'])
 		target.setStatus(info)
+
+	def clicked_connect(self, id_, targetFunc):
+		target = self._drone_by_id(id_)
+		QObject.connect(target, SIGNAL("droneStatusClicked"), targetFunc)
+
+	def _drone_by_id(self, id_):
+		for droneStatus in self._droneStatusList:
+			if droneStatus.id == id_:
+				return droneStatus
 
 
 
@@ -137,22 +155,39 @@ class VipDroneStatus(QWidget):
 
 
 		self.id = id_
-		# self.setText("Drone %s\n\n\n" % self.id)
 		self.setStyleSheet("""
 			background-color: rgba(0, 0, 0, 50%);
 			border-radius: 20px;
-			color: yellow;""")
+			border: 3px solid red;
+			color: yellow;
+			height: 30px;""")
+
 
 	def setStatus(self, info):
+		# self.setProperty('border-color', 'green')
+		# self.setProperty('color', QColor(0, 0, 255, 127))
+		if info['activate'] == 'on':
+			self.setStyleSheet("""
+				background-color: rgba(0, 0, 0, 50%);
+				border-radius: 20px;
+				border: 3px solid green;
+				color: yellow;
+				height: 30px;""")
 		text = """Drone %s
 		
 lat: %s
 lng: %s
 alt: %s
 """ % (info['id'], info['location']['lat'], info['location']['lng'], info['location']['alt'])
-
-		self.statusText.setText(text)
 		
+		# text = "Drone %s" % info['id']
+		self.statusText.setText(text)
+	
+	def enterEvent(self,event):
+		self.setCursor(QCursor(Qt.PointingHandCursor))
+
+	def mouseReleaseEvent(self, event):
+		self.emit(SIGNAL("droneStatusClicked"), self.id)
 
 
 
@@ -203,3 +238,47 @@ class VipTextCommandLayout(QWidget):
 			padding-top: 20px;
 			margin: 10px;""")
 		self._layout.addWidget(btn)
+
+
+class VipCommandLayout(QWidget):
+	def __init__(self):
+		super(VipCommandLayout, self).__init__()
+
+		self._layout = QGridLayout()
+		self.setLayout(self._layout)
+
+class VipCommandBtn(QPushButton):
+	def __init__(self, *args, **kwargs):
+		super(VipCommandBtn, self).__init__(*args, **kwargs)
+
+		self.setStyleSheet("""
+			background-color:rgba(0, 0, 0, 50%);
+			border: 1px solid white;
+			margin-bottom: 10px;
+			margin-top: 0px;
+			color: white;
+			height: 70px;
+			width: 50px;""")
+
+		self.setMouseTracking(True)
+
+	def enterEvent(self,event):
+		self.setCursor(QCursor(Qt.PointingHandCursor))
+		self.setStyleSheet("""
+			background-color:rgba(244, 208, 63, 90%);
+			border: 1px solid white;
+			margin-bottom: 10px;
+			margin-top: 0px;
+			color: white;
+			height: 70px;
+			width: 50px;""")
+
+	def leaveEvent(self,event):
+		self.setStyleSheet("""
+			background-color:rgba(0, 0, 0, 50%);
+			border: 1px solid white;
+			margin-bottom: 10px;
+			margin-top: 0px;
+			color: white;
+			height: 70px;
+			width: 50px;""")
