@@ -283,10 +283,26 @@ class MainFrame(QWidget):
 		self.logText.append(LOG("GUI", "Send stream %s command to drone %s" % (action, self.context.curSelected)))
 
 	def on_function1btn_clicked(self):
-		pass
+		command = {
+			"type": "dronemanager",
+			"data": {
+				"command": "f1",
+			}
+		}
+		self.server.send(self.context.curSelected, json.dumps(command))
+
+		self.logText.append(LOG("GUI", "Send function1 command to drone %s" % self.context.curSelected))
 
 	def on_function2btn_clicked(self):
-		pass
+		command = {
+			"type": "dronemanager",
+			"data": {
+				"command": "f2",
+			}
+		}
+		self.server.send(self.context.curSelected, json.dumps(command))
+
+		self.logText.append(LOG("GUI", "Send function2 command to drone %s" % self.context.curSelected))
 
 	def on_map_clicked(self):
 		self.stackedLayout.setCurrentIndex(0)
