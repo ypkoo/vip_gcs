@@ -380,8 +380,8 @@ class MainFrame(QWidget):
 				
 			elif serverReport.type == ServerReport.NEW:
 				self.logText.append(LOG("Server", 'A new drone %s is connected.' % serverReport.data))
-				if serverReport.data == "1":
-					self.context.isM600Connected = True
+				# if serverReport.data == "1":
+				# 	self.context.isM600Connected = True
 				self.droneStatusLayout.addWidget(serverReport.data)
 				self.droneStatusLayout.clicked_connect(serverReport.data, self.on_dronestatus_clicked)
 			elif serverReport.type == ServerReport.TERMINATE:
@@ -399,10 +399,10 @@ class MainFrame(QWidget):
 			info = drone.drone.get_info()
 			# print info
 
-			if info['id'] == "1":
-				self.context.m600Lat = info['location']['lat']
-				self.context.m600Lng = info['location']['lng']
-				self.context.m600Alt = info['location']['alt']
+			# if info['id'] == "1":
+			# 	self.context.m600Lat = info['location']['lat']
+			# 	self.context.m600Lng = info['location']['lng']
+			# 	self.context.m600Alt = info['location']['alt']
 
 			self.droneStatusLayout.setStatus(info)
 			self.gmap.frame.evaluateJavaScript('update_marker(%s, %s, %s)' % (info['id'], info['location']['lat'], info['location']['lng']))
@@ -418,14 +418,7 @@ if __name__ == '__main__':
 	QFontDatabase.addApplicationFont("/home/ypkoo/VIP_GCS/fonts/Lato/Lato-Light.ttf")
 	QFontDatabase.addApplicationFont("/home/ypkoo/VIP_GCS/fonts/Lato/Lato-Bold.ttf")
 	QFontDatabase.addApplicationFont("/home/ypkoo/VIP_GCS/fonts/Open_Sans/OpenSans-Light.ttf")
-	# latoLight = QFontDatabase.addApplicationFont("fonts/Lato/Lato-Light.ttf")
-	# if not latoLight == -1:
-	# 	print "font load successed"
-	# 	fontDB = QtGui.QFontDatabase()
-	# 	self.fontStyles = fontDB.styles('LatoLight')
-	# 	self.fontFamilies = QFontDatabase.applicationFontFamilies(latoLight)
-	# 	for fontFamily in self.fontFamilies:
-	# 		self.font = fontDB.font(fontFamily, self.fontStyles.first(), 24)
+
 
 	style = QSSHelper.open_qss('style.qss')
 	app.setStyleSheet(style)
