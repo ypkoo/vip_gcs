@@ -9,7 +9,9 @@ import sys, os, time, signal, json, datetime
 from aqua.qsshelper import QSSHelper
 
 HOST = ""
-PORT = 43211
+PORT = 43212
+
+""" test """
 
 def LOG(logger_, text):
 	logger = "[ "+logger_+" ]"
@@ -215,7 +217,7 @@ class MainFrame(QWidget):
 
 		self.gridLayout = QGridLayout()
 		self.gridLayout.addWidget(self.stackedLayout, 0, 0, 2, 2)
-		self.gridLayout.addWidget(self.navBar, 0, 0, 1, 1)
+		# self.gridLayout.addWidget(self.navBar, 0, 0, 1, 1)
 		self.gridLayout.setColumnStretch(0, 1)
 		self.gridLayout.setColumnStretch(1, 10)
 		self.gmapLayout.setRowStretch(0, 1)
