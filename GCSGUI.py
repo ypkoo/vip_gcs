@@ -132,13 +132,18 @@ class MainFrame(QWidget):
 		self.cmdLayout.setContentsMargins(0,0,0,0)
 		self.cmdWidget.setLayout(self.cmdLayout)
 		
-		self.droneIDLabel = QLabel()
-		self.takeoffBtn = VipCommandBtn("Take Off")
-		self.landBtn = VipCommandBtn("Land")
-		self.relocationBtn = VipCommandBtn("Relocation")
-		self.streamingBtn = VipCommandBtn("Streaming")
-		self.function1Btn = VipCommandBtn("Function 1")
-		self.function2Btn = VipCommandBtn("Function 2")
+
+
+		self.startBtn = VipCommandBtn("Start")
+		self.goBtn = VipCommandBtn("Go")
+		self.streamingOnBtn = VipCommandBtn("StreamOn")
+		self.streamingOffBtn = VipCommandBtn("StreamOff")
+		self.trackingOnBtn = VipCommandBtn("TrackingOn")
+		self.trackingOffBtn = VipCommandBtn("TrackingOff")
+		self.rotateBtn = VipCommandBtn("Rotate")
+		self.zoomInBtn = VipCommandBtn("ZoomIn")
+		self.zoomOutBtn = VipCommandBtn("ZoomOut")
+		self.stopBtn = VipCommandBtn("Stop")
 
 		self.droneInfo = QWidget()
 		self.droneInfo.setStyleSheet("""
@@ -161,24 +166,31 @@ class MainFrame(QWidget):
 		
 
 		# self.cmdLayout.addWidget(self.droneIDLabel, 0, 0, 1, 1)
-		self.cmdLayout.addWidget(self.droneInfo, 0, 0, 2, 1)
-		self.cmdLayout.addWidget(self.takeoffBtn, 0, 1, 1, 1)
-		self.cmdLayout.addWidget(self.landBtn, 1, 1, 1, 1)
-		self.cmdLayout.addWidget(self.relocationBtn, 0, 2, 1, 1)
-		self.cmdLayout.addWidget(self.streamingBtn, 0, 3, 1, 1)
-		self.cmdLayout.addWidget(self.function1Btn, 0, 4, 1, 1)
-		self.cmdLayout.addWidget(self.function2Btn, 1, 4, 1, 1)
+		self.cmdLayout.addWidget(self.startBtn, 0, 0, 1, 1)
+		self.cmdLayout.addWidget(self.goBtn, 1, 0, 1, 1)
+		self.cmdLayout.addWidget(self.streamingOnBtn, 0, 1, 1, 1)
+		self.cmdLayout.addWidget(self.streamingOffBtn, 1, 1, 1, 1)
+		self.cmdLayout.addWidget(self.trackingOnBtn, 0, 2, 1, 1)
+		self.cmdLayout.addWidget(self.trackingOffBtn, 1, 2, 1, 1)
+		self.cmdLayout.addWidget(self.zoomInBtn, 0, 3, 1, 1)
+		self.cmdLayout.addWidget(self.zoomOutBtn, 1, 3, 1, 1)
+		self.cmdLayout.addWidget(self.rotateBtn, 0, 4, 1, 1)
+		self.cmdLayout.addWidget(self.stopBtn, 1, 4, 1, 1)
 
-		self.takeoffBtn.clicked.connect(self.on_takeoffbtn_clicked)
-		self.landBtn.clicked.connect(self.on_landbtn_clicked)
-		self.relocationBtn.clicked.connect(self.on_relocationbtn_clicked)
-		self.streamingBtn.clicked.connect(self.on_streamingbtn_clicked)
-		self.function1Btn.clicked.connect(self.on_function1btn_clicked)
-		self.function2Btn.clicked.connect(self.on_function2btn_clicked)
+		self.startBtn.clicked.connect(self.on_startbtn_clicked)
+		self.goBtn.clicked.connect(self.on_gobtn_clicked)
+		self.streamingOnBtn.clicked.connect(self.on_streamingonbtn_clicked)
+		self.streamingOffBtn.clicked.connect(self.on_streamingoffbtn_clicked)
+		self.trackingOnBtn.clicked.connect(self.on_trackingonbtn_clicked)
+		self.trackingOffBtn.clicked.connect(self.on_trackingoffbtn_clicked)
+		self.zoomInBtn.clicked.connect(self.on_zoominbtn_clicked)
+		self.zoomOutBtn.clicked.connect(self.on_zoomoutbtn_clicked)
+		self.rotateBtn.clicked.connect(self.on_rotatebtn_clicked)
+		self.stopBtn.clicked.connect(self.on_stopbtn_clicked)
 
 		# self.cmdLayout.setRowStretch(0, 2)
 		# self.cmdLayout.setRowStretch(1, 10)
-		self.cmdLayout.setColumnStretch(0, 5)
+		self.cmdLayout.setColumnStretch(0, 2)
 		self.cmdLayout.setColumnStretch(1, 2)
 		self.cmdLayout.setColumnStretch(2, 2)
 		self.cmdLayout.setColumnStretch(3, 2)
@@ -226,85 +238,115 @@ class MainFrame(QWidget):
 		self.setLayout(self.gridLayout)
 		self.resize(2280, 1520)
 
-	def on_takeoffbtn_clicked(self):
+	def on_startbtn_clicked(self):
 		command = {
 			"type": "control",
 			"data": {
-				"command": "takeoff",
+				"command": "start",
 			}
 		}
 		self.server.send(self.context.curSelected, json.dumps(command))
 
 		self.logText.append(LOG("GUI", "Send takeoff command to drone %s" % self.context.curSelected))
 
-	def on_landbtn_clicked(self):
+	def on_gobtn_clicked(self):
 		command = {
 			"type": "control",
 			"data": {
-				"command": "land",
+				"command": "go",
 			}
 		}
 		self.server.send(self.context.curSelected, json.dumps(command))
 
-		self.logText.append(LOG("GUI", "Send land command to drone %s" % self.context.curSelected))
+		self.logText.append(LOG("GUI", "Send go command to drone %s" % self.context.curSelected))
 
-	def on_relocationbtn_clicked(self):
+	def on_streamingonbtn_clicked(self):
 		command = {
 			"type": "control",
 			"data": {
-				"command": "relocate",
-				"lat": "",
-				"lng": "",
-				"alt": "",
-				"yaw": "",
+				"command": "streamingon",
 			}
 		}
 		self.server.send(self.context.curSelected, json.dumps(command))
 
-		self.logText.append(LOG("GUI", "Send relocation command to drone %s" % self.context.curSelected))
+		self.logText.append(LOG("GUI", "Send streaming on command to drone %s" % self.context.curSelected))
 
-	def on_streamingbtn_clicked(self):
-		port = "5000%s" % self.context.curSelected
-		drone = self.server.drone_by_id(self.context.curSelected)
-		if drone.drone.stream == "on":
-			action = "off"
-		else:
-			action = "on"
-
+	def on_streamingoffbtn_clicked(self):
 		command = {
-			"type": "dronemanager",
+			"type": "control",
 			"data": {
-				"command": "stream",
-				"port": port,
-				"quality": "high",
-				"action": action,
+				"command": "streamingoff",
 			}
 		}
 		self.server.send(self.context.curSelected, json.dumps(command))
 
-		self.logText.append(LOG("GUI", "Send stream %s command to drone %s" % (action, self.context.curSelected)))
+		self.logText.append(LOG("GUI", "Send streaming off command to drone %s" % self.context.curSelected))
 
-	def on_function1btn_clicked(self):
+	def on_trackingonbtn_clicked(self):
 		command = {
-			"type": "dronemanager",
+			"type": "control",
 			"data": {
-				"command": "f1",
+				"command": "trackingon",
 			}
 		}
 		self.server.send(self.context.curSelected, json.dumps(command))
 
-		self.logText.append(LOG("GUI", "Send function1 command to drone %s" % self.context.curSelected))
+		self.logText.append(LOG("GUI", "Send tracking on command to drone %s" % self.context.curSelected))
 
-	def on_function2btn_clicked(self):
+	def on_trackingoffbtn_clicked(self):
 		command = {
-			"type": "dronemanager",
+			"type": "control",
 			"data": {
-				"command": "f2",
+				"command": "trackingoff",
 			}
 		}
 		self.server.send(self.context.curSelected, json.dumps(command))
 
-		self.logText.append(LOG("GUI", "Send function2 command to drone %s" % self.context.curSelected))
+		self.logText.append(LOG("GUI", "Send tracking off command to drone %s" % self.context.curSelected))
+
+	def on_zoominbtn_clicked(self):
+		command = {
+			"type": "control",
+			"data": {
+				"command": "zoomin",
+			}
+		}
+		self.server.send(self.context.curSelected, json.dumps(command))
+
+		self.logText.append(LOG("GUI", "Send zoom in command to drone %s" % self.context.curSelected))
+
+	def on_zoomoutbtn_clicked(self):
+		command = {
+			"type": "control",
+			"data": {
+				"command": "zoomout",
+			}
+		}
+		self.server.send(self.context.curSelected, json.dumps(command))
+
+		self.logText.append(LOG("GUI", "Send zoomout command to drone %s" % self.context.curSelected))
+
+	def on_rotatebtn_clicked(self):
+		command = {
+			"type": "control",
+			"data": {
+				"command": "rotate",
+			}
+		}
+		self.server.send(self.context.curSelected, json.dumps(command))
+
+		self.logText.append(LOG("GUI", "Send rotate command to drone %s" % self.context.curSelected))
+
+	def on_stopbtn_clicked(self):
+		command = {
+			"type": "control",
+			"data": {
+				"command": "zoomout",
+			}
+		}
+		self.server.send(self.context.curSelected, json.dumps(command))
+
+		self.logText.append(LOG("GUI", "Send stop command to drone %s" % self.context.curSelected))
 
 	def on_map_clicked(self):
 		self.stackedLayout.setCurrentIndex(0)
