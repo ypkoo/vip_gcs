@@ -92,6 +92,14 @@ class VipStatusLayout(QWidget):
 		self.setLayout(self._layout)
 		# self.setMouseTracking(True)
 
+		# self.sendtoall = VipSendToAll(0)
+		# self._droneStatusList.append(self.sendtoall)
+		# self._layout.addWidget(self.sendtoall)
+
+		# self.sendtoall = VipDroneStatus("0")
+		# self._droneStatusList.append(self.sendtoall)
+		# self._layout.addWidget(self.sendtoall)
+
 	def addWidget(self, id_):
 		# self._btnList.append(btn)
 
@@ -139,7 +147,28 @@ class VipStatusLayout(QWidget):
 			if droneStatus.id == id_:
 				return droneStatus
 
+class VipSendToAll(QWidget):
+	def __init__(self, id_):
+		super(VipSendToAll, self).__init__()
 
+		self.id = id_
+		self._layout = QGridLayout()
+		self.statusText = QLabel("Send to all")
+		self.setLayout(self._layout)
+		self._layout.addWidget(self.statusText, 0, 0)
+
+		self.setStyleSheet("""
+			background-color: rgba(0, 0, 0, 50%);
+			border-radius: 20px;
+			border: 3px solid green;
+			color: yellow;
+			height: 30px;""")
+
+	def enterEvent(self,event):
+		self.setCursor(QCursor(Qt.PointingHandCursor))
+
+	def mouseReleaseEvent(self, event):
+		self.emit(SIGNAL("droneStatusClicked"), self.id)
 
 class VipDroneStatus(QWidget):
 	def __init__(self, id_):
@@ -147,7 +176,10 @@ class VipDroneStatus(QWidget):
 
 		self._layout = QGridLayout()
 
-		self.statusText = QLabel("Drone %s\n\n\n" % (id_))
+		if id_ == "0":
+			self.statusText = QLabel("Send to all")
+		else:
+			self.statusText = QLabel("Drone %s\n\n\n" % (id_))
 		# self.statusText.setReadOnly(True)
 		self.setLayout(self._layout)
 		self._layout.addWidget(self.statusText, 0, 0)
@@ -155,12 +187,21 @@ class VipDroneStatus(QWidget):
 
 
 		self.id = id_
-		self.setStyleSheet("""
-			background-color: rgba(0, 0, 0, 50%);
-			border-radius: 20px;
-			border: 3px solid red;
-			color: yellow;
-			height: 30px;""")
+
+		if self.id == "0":
+			self.setStyleSheet("""
+				background-color: rgba(0, 0, 0, 50%);
+				border-radius: 20px;
+				border: 3px solid green;
+				color: yellow;
+				height: 30px;""")
+		else:
+			self.setStyleSheet("""
+				background-color: rgba(0, 0, 0, 50%);
+				border-radius: 20px;
+				border: 3px solid red;
+				color: yellow;
+				height: 30px;""")
 
 
 	def setStatus(self, info):

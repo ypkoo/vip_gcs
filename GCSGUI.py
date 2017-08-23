@@ -99,6 +99,9 @@ class MainFrame(QWidget):
 
 		self.droneStatusLayout = VipStatusLayout()
 
+		self.droneStatusLayout.addWidget("0")
+		self.droneStatusLayout.clicked_connect("0", self.on_dronestatus_clicked)
+
 
 		self.streamingBtn.clicked.connect(self.on_streaming_clicked)
 		self.mapBtn.clicked.connect(self.on_map_clicked)
@@ -197,7 +200,9 @@ class MainFrame(QWidget):
 		self.cmdLayout.setColumnStretch(4, 2)
 
 
+		self.sendtoallBox = QCheckBox("send to all")
 
+		# self.gmapLayout.addWidget(self.sendtoallBox, 1, 0, 1, 1)
 		self.gmapLayout.addWidget(self.gmap, 0, 0, 3, 6)
 		self.gmapLayout.addWidget(self.droneStatusLayout, 0, 5, 2, 1)
 		# self.gmapLayout.addWidget(self.textCommandLayout, 1, 1, 1, 3)
@@ -245,9 +250,13 @@ class MainFrame(QWidget):
 				"command": "start",
 			}
 		}
-		self.server.send(self.context.curSelected, json.dumps(command))
-
-		self.logText.append(LOG("GUI", "Send takeoff command to drone %s" % self.context.curSelected))
+		
+		if self.context.curSelected == "0":
+			self.server.send_to_all(json.dumps(command))
+			self.logText.append(LOG("GUI", "Send start command to all drones"))
+		else:
+			self.server.send(self.context.curSelected, json.dumps(command))
+			self.logText.append(LOG("GUI", "Send start command to drone %s" % self.context.curSelected))
 
 	def on_gobtn_clicked(self):
 		command = {
@@ -256,9 +265,12 @@ class MainFrame(QWidget):
 				"command": "go",
 			}
 		}
-		self.server.send(self.context.curSelected, json.dumps(command))
-
-		self.logText.append(LOG("GUI", "Send go command to drone %s" % self.context.curSelected))
+		if self.context.curSelected == "0":
+			self.server.send_to_all(json.dumps(command))
+			self.logText.append(LOG("GUI", "Send go command to all drones"))
+		else:
+			self.server.send(self.context.curSelected, json.dumps(command))
+			self.logText.append(LOG("GUI", "Send go command to drone %s" % self.context.curSelected))
 
 	def on_streamingonbtn_clicked(self):
 		command = {
@@ -267,9 +279,13 @@ class MainFrame(QWidget):
 				"command": "streamingon",
 			}
 		}
-		self.server.send(self.context.curSelected, json.dumps(command))
 
-		self.logText.append(LOG("GUI", "Send streaming on command to drone %s" % self.context.curSelected))
+		if self.context.curSelected == "0":
+			self.server.send_to_all(json.dumps(command))
+			self.logText.append(LOG("GUI", "Send streaming on command to all drones"))
+		else:
+			self.server.send(self.context.curSelected, json.dumps(command))
+			self.logText.append(LOG("GUI", "Send streaming on command to drone %s" % self.context.curSelected))
 
 	def on_streamingoffbtn_clicked(self):
 		command = {
@@ -278,9 +294,12 @@ class MainFrame(QWidget):
 				"command": "streamingoff",
 			}
 		}
-		self.server.send(self.context.curSelected, json.dumps(command))
-
-		self.logText.append(LOG("GUI", "Send streaming off command to drone %s" % self.context.curSelected))
+		if self.context.curSelected == "0":
+			self.server.send_to_all(json.dumps(command))
+			self.logText.append(LOG("GUI", "Send streaming off command to all drones"))
+		else:
+			self.server.send(self.context.curSelected, json.dumps(command))
+			self.logText.append(LOG("GUI", "Send streaming off command to drone %s" % self.context.curSelected))
 
 	def on_trackingonbtn_clicked(self):
 		command = {
@@ -289,9 +308,12 @@ class MainFrame(QWidget):
 				"command": "trackingon",
 			}
 		}
-		self.server.send(self.context.curSelected, json.dumps(command))
-
-		self.logText.append(LOG("GUI", "Send tracking on command to drone %s" % self.context.curSelected))
+		if self.context.curSelected == "0":
+			self.server.send_to_all(json.dumps(command))
+			self.logText.append(LOG("GUI", "Send tracking on command to all drones"))
+		else:
+			self.server.send(self.context.curSelected, json.dumps(command))
+			self.logText.append(LOG("GUI", "Send tracking on command to drone %s" % self.context.curSelected))
 
 	def on_trackingoffbtn_clicked(self):
 		command = {
@@ -300,9 +322,12 @@ class MainFrame(QWidget):
 				"command": "trackingoff",
 			}
 		}
-		self.server.send(self.context.curSelected, json.dumps(command))
-
-		self.logText.append(LOG("GUI", "Send tracking off command to drone %s" % self.context.curSelected))
+		if self.context.curSelected == "0":
+			self.server.send_to_all(json.dumps(command))
+			self.logText.append(LOG("GUI", "Send tracking off command to all drones"))
+		else:
+			self.server.send(self.context.curSelected, json.dumps(command))
+			self.logText.append(LOG("GUI", "Send tracking off command to drone %s" % self.context.curSelected))
 
 	def on_zoominbtn_clicked(self):
 		command = {
@@ -311,9 +336,12 @@ class MainFrame(QWidget):
 				"command": "zoomin",
 			}
 		}
-		self.server.send(self.context.curSelected, json.dumps(command))
-
-		self.logText.append(LOG("GUI", "Send zoom in command to drone %s" % self.context.curSelected))
+		if self.context.curSelected == "0":
+			self.server.send_to_all(json.dumps(command))
+			self.logText.append(LOG("GUI", "Send zoom in command to all drones"))
+		else:
+			self.server.send(self.context.curSelected, json.dumps(command))
+			self.logText.append(LOG("GUI", "Send zoom in command to drone %s" % self.context.curSelected))
 
 	def on_zoomoutbtn_clicked(self):
 		command = {
@@ -322,9 +350,12 @@ class MainFrame(QWidget):
 				"command": "zoomout",
 			}
 		}
-		self.server.send(self.context.curSelected, json.dumps(command))
-
-		self.logText.append(LOG("GUI", "Send zoomout command to drone %s" % self.context.curSelected))
+		if self.context.curSelected == "0":
+			self.server.send_to_all(json.dumps(command))
+			self.logText.append(LOG("GUI", "Send zoom out command to all drones"))
+		else:
+			self.server.send(self.context.curSelected, json.dumps(command))
+			self.logText.append(LOG("GUI", "Send zoom out command to drone %s" % self.context.curSelected))
 
 	def on_rotatebtn_clicked(self):
 		command = {
@@ -333,9 +364,12 @@ class MainFrame(QWidget):
 				"command": "rotate",
 			}
 		}
-		self.server.send(self.context.curSelected, json.dumps(command))
-
-		self.logText.append(LOG("GUI", "Send rotate command to drone %s" % self.context.curSelected))
+		if self.context.curSelected == "0":
+			self.server.send_to_all(json.dumps(command))
+			self.logText.append(LOG("GUI", "Send rotate command to all drones"))
+		else:
+			self.server.send(self.context.curSelected, json.dumps(command))
+			self.logText.append(LOG("GUI", "Send rotate command to drone %s" % self.context.curSelected))
 
 	def on_stopbtn_clicked(self):
 		command = {
@@ -344,9 +378,12 @@ class MainFrame(QWidget):
 				"command": "zoomout",
 			}
 		}
-		self.server.send(self.context.curSelected, json.dumps(command))
-
-		self.logText.append(LOG("GUI", "Send stop command to drone %s" % self.context.curSelected))
+		if self.context.curSelected == "0":
+			self.server.send_to_all(json.dumps(command))
+			self.logText.append(LOG("GUI", "Send stop command to all drones"))
+		else:
+			self.server.send(self.context.curSelected, json.dumps(command))
+			self.logText.append(LOG("GUI", "Send stop command to drone %s" % self.context.curSelected))
 
 	def on_map_clicked(self):
 		self.stackedLayout.setCurrentIndex(0)
@@ -402,14 +439,15 @@ class MainFrame(QWidget):
 			self.context.lng = msg[2]
 			text = "(%s, %s) clicked." % (self.context.lat[:-10], self.context.lng[:-10])
 			self.logText.append(LOG("GUI", text))
-			self.cmdWidget.hide()
+			# self.cmdWidget.hide()
 
 	def on_dronestatus_clicked(self, id_):
 		self.context.curSelected = id_
-		drone = self.server.drone_by_id(id_)
-		self.curDroneLabel.setText("Drone %s stream: %s" % (id_, drone.drone.stream))
-		print "%s clicked!" % id_
-		self.cmdWidget.show()
+		print id_
+		# drone = self.server.drone_by_id(id_)
+		# self.curDroneLabel.setText("Drone %s stream: %s" % (id_, drone.drone.stream))
+		# print "%s clicked!" % id_
+		# self.cmdWidget.show()
 
 
 

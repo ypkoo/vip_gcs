@@ -321,8 +321,7 @@ class GCSSeverThread(threading.Thread):
 
 	def send_to_all(self, msg):
 		for drone in self.droneList:
-			if not drone.isM600:
-				drone.send(msg)
+			drone.send(msg)
 
 	def start_alexa_server(self):
 		self.alexaServer = AlexaServer(self.clientReportQueue)
