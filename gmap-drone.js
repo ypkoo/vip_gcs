@@ -80,10 +80,6 @@ function update_marker(id, lat, lng) {
 			map: map
 		});
 
-		if (id == "1") {
-			MAN ? marker.setIcon(icons_url['man-yellow']) : marker.setIcon(icons_url['red']);
-			
-		}
 
 		marker.addListener('click', function() {
 			markerPos = marker.getPosition()
