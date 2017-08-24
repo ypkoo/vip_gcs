@@ -107,21 +107,9 @@ class DroneClientThread(threading.Thread):
 				if self.drone:
 					
 					self._update_drone(data)
-					if self.isM600:
-						msg = {
-							"type": "M600",
-							"data": {
-								"lat": self.drone.lat,
-								"lng": self.drone.lng,
-								"alt": self.drone.alt,
-							},
-						}
-						self.send_to_all(json.dumps(msg))
+					
 				else:
-					if data["data"]["id"] == "1":
-						self.isM600 = True
-					else:
-						self.isM600 = False
+					
 
 					self.drone = Drone(data["data"]["id"])
 					self._update_drone(data)
