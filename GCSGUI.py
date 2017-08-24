@@ -245,10 +245,8 @@ class MainFrame(QWidget):
 
 	def on_startbtn_clicked(self):
 		command = {
-			"type": "control",
-			"data": {
-				"command": "start",
-			}
+			"topic": "gcs",
+			"command": "start",
 		}
 		
 		if self.context.curSelected == "0":
@@ -260,10 +258,8 @@ class MainFrame(QWidget):
 
 	def on_gobtn_clicked(self):
 		command = {
-			"type": "control",
-			"data": {
-				"command": "go",
-			}
+			"topic": "gcs",
+			"command": "go",
 		}
 		if self.context.curSelected == "0":
 			self.server.send_to_all(json.dumps(command))
@@ -274,10 +270,8 @@ class MainFrame(QWidget):
 
 	def on_streamingonbtn_clicked(self):
 		command = {
-			"type": "control",
-			"data": {
-				"command": "streamingon",
-			}
+			"topic": "gcs",
+			"command": "streaming on",
 		}
 
 		if self.context.curSelected == "0":
@@ -289,10 +283,8 @@ class MainFrame(QWidget):
 
 	def on_streamingoffbtn_clicked(self):
 		command = {
-			"type": "control",
-			"data": {
-				"command": "streamingoff",
-			}
+			"topic": "gcs",
+			"command": "streaming off",
 		}
 		if self.context.curSelected == "0":
 			self.server.send_to_all(json.dumps(command))
@@ -303,10 +295,8 @@ class MainFrame(QWidget):
 
 	def on_trackingonbtn_clicked(self):
 		command = {
-			"type": "control",
-			"data": {
-				"command": "trackingon",
-			}
+			"topic": "gcs",
+			"command": "tracking on",
 		}
 		if self.context.curSelected == "0":
 			self.server.send_to_all(json.dumps(command))
@@ -317,10 +307,8 @@ class MainFrame(QWidget):
 
 	def on_trackingoffbtn_clicked(self):
 		command = {
-			"type": "control",
-			"data": {
-				"command": "trackingoff",
-			}
+			"topic": "gcs",
+			"command": "tracking off",
 		}
 		if self.context.curSelected == "0":
 			self.server.send_to_all(json.dumps(command))
@@ -331,10 +319,8 @@ class MainFrame(QWidget):
 
 	def on_zoominbtn_clicked(self):
 		command = {
-			"type": "control",
-			"data": {
-				"command": "zoomin",
-			}
+			"topic": "gcs",
+			"command": "zoom in",
 		}
 		if self.context.curSelected == "0":
 			self.server.send_to_all(json.dumps(command))
@@ -345,10 +331,8 @@ class MainFrame(QWidget):
 
 	def on_zoomoutbtn_clicked(self):
 		command = {
-			"type": "control",
-			"data": {
-				"command": "zoomout",
-			}
+			"topic": "gcs",
+			"command": "zoom out",
 		}
 		if self.context.curSelected == "0":
 			self.server.send_to_all(json.dumps(command))
@@ -359,10 +343,8 @@ class MainFrame(QWidget):
 
 	def on_rotatebtn_clicked(self):
 		command = {
-			"type": "control",
-			"data": {
-				"command": "rotate",
-			}
+			"topic": "gcs",
+			"command": "rotate",
 		}
 		if self.context.curSelected == "0":
 			self.server.send_to_all(json.dumps(command))
@@ -373,10 +355,8 @@ class MainFrame(QWidget):
 
 	def on_stopbtn_clicked(self):
 		command = {
-			"type": "control",
-			"data": {
-				"command": "zoomout",
-			}
+			"topic": "gcs",
+			"command": "stop",
 		}
 		if self.context.curSelected == "0":
 			self.server.send_to_all(json.dumps(command))
