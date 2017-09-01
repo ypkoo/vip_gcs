@@ -21,6 +21,7 @@ class PollableQueue(Queue.Queue, object):
 		super(PollableQueue, self).__init__()
 
 		server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 		server.bind(('127.0.0.1', 0))
 		server.listen(1)
 		self._putsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -205,6 +206,7 @@ class GCSSeverThread(threading.Thread):
 
 		try:
 			self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 			self.socket.bind((host, port))
 			self.socket.listen(5)
 			self.pollingList.append(self.socket)

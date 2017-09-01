@@ -9,7 +9,7 @@ import sys, os, time, signal, json, datetime
 from aqua.qsshelper import QSSHelper
 
 HOST = ""
-PORT = 43212
+PORT = 43211
 
 """ test """
 
@@ -140,7 +140,8 @@ class MainFrame(QWidget):
 		self.startBtn = VipCommandBtn("Start")
 		self.goBtn = VipCommandBtn("Go")
 		self.streamingOnBtn = VipCommandBtn("StreamOn")
-		self.streamingOffBtn = VipCommandBtn("StreamOff")
+		# self.streamingOffBtn = VipCommandBtn("StreamOff")
+		self.streamingOffBtn = VipCommandBtn("Redetect")		
 		self.trackingOnBtn = VipCommandBtn("TrackingOn")
 		self.trackingOffBtn = VipCommandBtn("TrackingOff")
 		self.rotateBtn = VipCommandBtn("Rotate")
@@ -271,7 +272,7 @@ class MainFrame(QWidget):
 	def on_streamingonbtn_clicked(self):
 		command = {
 			"topic": "gcs",
-			"command": "streaming on",
+			"command": "stream on",
 		}
 
 		if self.context.curSelected == "0":
@@ -284,7 +285,8 @@ class MainFrame(QWidget):
 	def on_streamingoffbtn_clicked(self):
 		command = {
 			"topic": "gcs",
-			"command": "streaming off",
+			"command": "redetect"
+			# "command": "stream off", # kdw
 		}
 		if self.context.curSelected == "0":
 			self.server.send_to_all(json.dumps(command))
