@@ -219,7 +219,8 @@ class VipDroneStatus(QWidget):
 lat: %s
 lng: %s
 alt: %s
-""" % (info['id'], info['location']['lat'], info['location']['lng'], info['location']['alt'])
+yaw: %s
+""" % (info['id'], info['location']['lat'], info['location']['lng'], info['location']['alt'], info['yaw'])
 		
 		# text = "Drone %s" % info['id']
 		self.statusText.setText(text)

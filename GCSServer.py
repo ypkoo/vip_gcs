@@ -249,46 +249,32 @@ class GCSSeverThread(threading.Thread):
 						# self.serverReportQueue.put(ServerReport(ServerReport.TEXT, text))
 						self.serverReportQueue.put(ServerReport(ServerReport.TERMINATE, msg.data.drone.id))
 					elif msg.type == ClientReport.ALEXA:
-						m600 = self.drone_by_id("1")
 						if msg.data == "start":
+							
 							command = {
-								"type": "control",
-								"data": {
-									"command": "start",
-									"lat": m600.drone.lat,
-									"lng": m600.drone.lng,
-									"alt": m600.drone.alt,
-									"timestamp": str(datetime.datetime.now()),
-								}
+								"topic": "gcs",
+								"command": "start",
 							}
+							
 							self.send_to_all(json.dumps(command))
-							self.serverReportQueue.put(ServerReport(ServerReport.ALEXA, "Send start command to drones"))
+
+							self.serverReportQueue.put(ServerReport(ServerReport.ALEXA, "Send start command to all drones"))
 						elif msg.data == "go":
 							command = {
-								"type": "control",
-								"data": {
-									"command": "go",
-									"lat": m600.drone.lat,
-									"lng": m600.drone.lng,
-									"alt": m600.drone.alt,
-									"timestamp": str(datetime.datetime.now()),
-								}
+								"topic": "gcs",
+								"command": "go",
 							}
+							
 							self.send_to_all(json.dumps(command))
-							self.serverReportQueue.put(ServerReport(ServerReport.ALEXA, "Send go command to drones"))
-						elif msg.data == "stop":
+							self.serverReportQueue.put(ServerReport(ServerReport.ALEXA, "Send go command to all drones"))
+						elif msg.data == "stream":
 							command = {
-								"type": "control",
-								"data": {
-									"command": "stop",
-									"lat": m600.drone.lat,
-									"lng": m600.drone.lng,
-									"alt": m600.drone.alt,
-									"timestamp": str(datetime.datetime.now()),
-								}
+								"topic": "gcs",
+								"command": "stream on",
 							}
+							
 							self.send_to_all(json.dumps(command))
-							self.serverReportQueue.put(ServerReport(ServerReport.ALEXA, "Send stop command to drones"))
+							self.serverReportQueue.put(ServerReport(ServerReport.ALEXA, "Send stream on command to all drones"))
 
 		self.alexaServer.server.shutdown()
 

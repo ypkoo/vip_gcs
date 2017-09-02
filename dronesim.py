@@ -1,6 +1,6 @@
 import socket, Queue, threading, time, random, sys, json, select, GCSServer, datetime
 
-ADDR = ("127.0.0.1", 43212)
+ADDR = ("127.0.0.1", 43211)
 id_ = sys.argv[1]
 
 class DroneSim(threading.Thread):

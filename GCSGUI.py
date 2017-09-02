@@ -52,12 +52,8 @@ class VipContext(object):
 		curLat = None
 		curLng = None
 		curAlt = None
-		m600Lat = None
-		m600Lng = None
-		m600Alt = None
-		curSelected = None
 
-		self.isM600Connected = False
+		curSelected = None
 
 class MainFrame(QWidget):
 
@@ -144,7 +140,7 @@ class MainFrame(QWidget):
 		self.streamingOffBtn = VipCommandBtn("Redetect")		
 		self.trackingOnBtn = VipCommandBtn("TrackingOn")
 		self.trackingOffBtn = VipCommandBtn("TrackingOff")
-		self.rotateBtn = VipCommandBtn("Rotate")
+		self.redetectBtn = VipCommandBtn("Redetect")
 		self.zoomInBtn = VipCommandBtn("ZoomIn")
 		self.zoomOutBtn = VipCommandBtn("ZoomOut")
 		self.stopBtn = VipCommandBtn("Stop")
@@ -178,7 +174,7 @@ class MainFrame(QWidget):
 		self.cmdLayout.addWidget(self.trackingOffBtn, 1, 2, 1, 1)
 		self.cmdLayout.addWidget(self.zoomInBtn, 0, 3, 1, 1)
 		self.cmdLayout.addWidget(self.zoomOutBtn, 1, 3, 1, 1)
-		self.cmdLayout.addWidget(self.rotateBtn, 0, 4, 1, 1)
+		self.cmdLayout.addWidget(self.redetectBtn, 0, 4, 1, 1)
 		self.cmdLayout.addWidget(self.stopBtn, 1, 4, 1, 1)
 
 		self.startBtn.clicked.connect(self.on_startbtn_clicked)
@@ -189,7 +185,7 @@ class MainFrame(QWidget):
 		self.trackingOffBtn.clicked.connect(self.on_trackingoffbtn_clicked)
 		self.zoomInBtn.clicked.connect(self.on_zoominbtn_clicked)
 		self.zoomOutBtn.clicked.connect(self.on_zoomoutbtn_clicked)
-		self.rotateBtn.clicked.connect(self.on_rotatebtn_clicked)
+		self.redetectBtn.clicked.connect(self.on_redetectbtn_clicked)
 		self.stopBtn.clicked.connect(self.on_stopbtn_clicked)
 
 		# self.cmdLayout.setRowStretch(0, 2)
@@ -285,7 +281,7 @@ class MainFrame(QWidget):
 	def on_streamingoffbtn_clicked(self):
 		command = {
 			"topic": "gcs",
-			"command": "redetect"
+			"command": "stream off"
 			# "command": "stream off", # kdw
 		}
 		if self.context.curSelected == "0":
@@ -343,17 +339,17 @@ class MainFrame(QWidget):
 			self.server.send(self.context.curSelected, json.dumps(command))
 			self.logText.append(LOG("GUI", "Send zoom out command to drone %s" % self.context.curSelected))
 
-	def on_rotatebtn_clicked(self):
+	def on_redetectbtn_clicked(self):
 		command = {
 			"topic": "gcs",
-			"command": "rotate",
+			"command": "redetect",
 		}
 		if self.context.curSelected == "0":
 			self.server.send_to_all(json.dumps(command))
-			self.logText.append(LOG("GUI", "Send rotate command to all drones"))
+			self.logText.append(LOG("GUI", "Send redetect command to all drones"))
 		else:
 			self.server.send(self.context.curSelected, json.dumps(command))
-			self.logText.append(LOG("GUI", "Send rotate command to drone %s" % self.context.curSelected))
+			self.logText.append(LOG("GUI", "Send redetect command to drone %s" % self.context.curSelected))
 
 	def on_stopbtn_clicked(self):
 		command = {
@@ -421,15 +417,10 @@ class MainFrame(QWidget):
 			self.context.lng = msg[2]
 			text = "(%s, %s) clicked." % (self.context.lat[:-10], self.context.lng[:-10])
 			self.logText.append(LOG("GUI", text))
-			# self.cmdWidget.hide()
 
 	def on_dronestatus_clicked(self, id_):
 		self.context.curSelected = id_
-		print id_
-		# drone = self.server.drone_by_id(id_)
-		# self.curDroneLabel.setText("Drone %s stream: %s" % (id_, drone.drone.stream))
-		# print "%s clicked!" % id_
-		# self.cmdWidget.show()
+
 
 
 
@@ -459,12 +450,7 @@ class MainFrame(QWidget):
 
 		for drone in self.server.droneList:
 			info = drone.drone.get_info()
-			# print info
 
-			# if info['id'] == "1":
-			# 	self.context.m600Lat = info['location']['lat']
-			# 	self.context.m600Lng = info['location']['lng']
-			# 	self.context.m600Alt = info['location']['alt']
 
 			self.droneStatusLayout.setStatus(info)
 			self.gmap.frame.evaluateJavaScript('update_marker(%s, %s, %s)' % (info['id'], info['location']['lat'], info['location']['lng']))
