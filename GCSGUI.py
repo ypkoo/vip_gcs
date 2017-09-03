@@ -129,6 +129,7 @@ class MainFrame(QWidget):
 		self.cmdLayout = QGridLayout()
 		# self.cmdLayout.setSpacing(0)
 		self.cmdLayout.setContentsMargins(0,0,0,0)
+		self.cmdLayout.setAlignment(Qt.AlignTop)
 		self.cmdWidget.setLayout(self.cmdLayout)
 		
 
@@ -166,16 +167,28 @@ class MainFrame(QWidget):
 		
 
 		# self.cmdLayout.addWidget(self.droneIDLabel, 0, 0, 1, 1)
+		# self.cmdLayout.addWidget(self.startBtn, 0, 0, 1, 1)
+		# self.cmdLayout.addWidget(self.goBtn, 1, 0, 1, 1)
+		# self.cmdLayout.addWidget(self.streamingOnBtn, 0, 1, 1, 1)
+		# self.cmdLayout.addWidget(self.streamingOffBtn, 1, 1, 1, 1)
+		# self.cmdLayout.addWidget(self.trackingOnBtn, 0, 2, 1, 1)
+		# self.cmdLayout.addWidget(self.trackingOffBtn, 1, 2, 1, 1)
+		# self.cmdLayout.addWidget(self.zoomInBtn, 0, 3, 1, 1)
+		# self.cmdLayout.addWidget(self.zoomOutBtn, 1, 3, 1, 1)
+		# self.cmdLayout.addWidget(self.redetectBtn, 0, 4, 1, 1)
+		# self.cmdLayout.addWidget(self.stopBtn, 1, 4, 1, 1)
+
 		self.cmdLayout.addWidget(self.startBtn, 0, 0, 1, 1)
 		self.cmdLayout.addWidget(self.goBtn, 1, 0, 1, 1)
-		self.cmdLayout.addWidget(self.streamingOnBtn, 0, 1, 1, 1)
-		self.cmdLayout.addWidget(self.streamingOffBtn, 1, 1, 1, 1)
-		self.cmdLayout.addWidget(self.trackingOnBtn, 0, 2, 1, 1)
-		self.cmdLayout.addWidget(self.trackingOffBtn, 1, 2, 1, 1)
-		self.cmdLayout.addWidget(self.zoomInBtn, 0, 3, 1, 1)
-		self.cmdLayout.addWidget(self.zoomOutBtn, 1, 3, 1, 1)
-		self.cmdLayout.addWidget(self.redetectBtn, 0, 4, 1, 1)
-		self.cmdLayout.addWidget(self.stopBtn, 1, 4, 1, 1)
+		self.cmdLayout.addWidget(self.streamingOnBtn, 2, 0, 1, 1)
+		self.cmdLayout.addWidget(self.streamingOffBtn, 3, 0, 1, 1)
+		self.cmdLayout.addWidget(self.trackingOnBtn, 4, 0, 1, 1)
+		self.cmdLayout.addWidget(self.trackingOffBtn, 5, 0, 1, 1)
+		self.cmdLayout.addWidget(self.zoomInBtn, 6, 0, 1, 1)
+		self.cmdLayout.addWidget(self.zoomOutBtn, 7, 0, 1, 1)
+		self.cmdLayout.addWidget(self.redetectBtn, 8, 0, 1, 1)
+		self.cmdLayout.addWidget(self.stopBtn, 9, 0, 1, 1)
+
 
 		self.startBtn.clicked.connect(self.on_startbtn_clicked)
 		self.goBtn.clicked.connect(self.on_gobtn_clicked)
@@ -190,11 +203,11 @@ class MainFrame(QWidget):
 
 		# self.cmdLayout.setRowStretch(0, 2)
 		# self.cmdLayout.setRowStretch(1, 10)
-		self.cmdLayout.setColumnStretch(0, 2)
-		self.cmdLayout.setColumnStretch(1, 2)
-		self.cmdLayout.setColumnStretch(2, 2)
-		self.cmdLayout.setColumnStretch(3, 2)
-		self.cmdLayout.setColumnStretch(4, 2)
+		# self.cmdLayout.setColumnStretch(0, 2)
+		# self.cmdLayout.setColumnStretch(1, 2)
+		# self.cmdLayout.setColumnStretch(2, 2)
+		# self.cmdLayout.setColumnStretch(3, 2)
+		# self.cmdLayout.setColumnStretch(4, 2)
 
 
 		self.sendtoallBox = QCheckBox("send to all")
@@ -203,16 +216,16 @@ class MainFrame(QWidget):
 		self.gmapLayout.addWidget(self.gmap, 0, 0, 3, 6)
 		self.gmapLayout.addWidget(self.droneStatusLayout, 0, 5, 2, 1)
 		# self.gmapLayout.addWidget(self.textCommandLayout, 1, 1, 1, 3)
-		self.gmapLayout.addWidget(self.cmdWidget, 2, 0, 1, 4)
+		self.gmapLayout.addWidget(self.cmdWidget, 0, 0, 3, 1)
 		self.gmapLayout.addWidget(self.logText, 2, 4, 1, 2)
 
 
 		self.gmapLayout.setColumnStretch(0, 1)
-		self.gmapLayout.setColumnStretch(1, 1)
-		self.gmapLayout.setColumnStretch(2, 1)
-		self.gmapLayout.setColumnStretch(3, 1)
+		self.gmapLayout.setColumnStretch(1, 2)
+		self.gmapLayout.setColumnStretch(2, 2)
+		self.gmapLayout.setColumnStretch(3, 2)
 		self.gmapLayout.setColumnStretch(4, 2)
-		self.gmapLayout.setColumnStretch(5, 1)
+		self.gmapLayout.setColumnStretch(5, 2)
 		self.gmapLayout.setRowStretch(0, 6)
 		self.gmapLayout.setRowStretch(1, 1)
 		self.gmapLayout.setRowStretch(2, 1)
@@ -478,6 +491,9 @@ if __name__ == '__main__':
 	# except KeyboardInterrupt:
 	# 	print "KeyboardInterrupt"
 	# 	sys.exit(app.exec_())
+
 	sys.exit(app.exec_())
+	app.quit()
+
 
 	
