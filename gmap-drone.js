@@ -5,6 +5,7 @@ var lineList = [];
 
 var groundGPS = {lat: 36.3695544, lng: 127.368479};
 var N1GPS = {lat: 36.374092, lng: 127.365638};
+var demo = {lat: 36.3697, lng: 127.3614};
 
 // var icons_url = {
 // 	'home': 'http://localhost:8000/map-icons/icon-gcs2-home.png',
@@ -27,7 +28,7 @@ var icons_url = {
 
 // Initialize the map. Called when this file is loaded.
 function initMap() {
-	var GCSLatLng = groundGPS;
+	var GCSLatLng = demo;
 
 	map = new google.maps.Map(document.getElementById('map'), {
 		center: GCSLatLng,

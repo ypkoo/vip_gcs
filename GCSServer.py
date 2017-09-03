@@ -104,7 +104,7 @@ class DroneClientThread(threading.Thread):
 		while self.alive.isSet():
 			raw_data = self._socket.recv(2048)
 			if raw_data:
-				data = json.loads(raw_data)
+				data = json.loads(raw_data) # kokoga mondai
 				if self.drone:
 					
 					self._update_drone(data)
@@ -267,7 +267,15 @@ class GCSSeverThread(threading.Thread):
 							
 							self.send_to_all(json.dumps(command))
 							self.serverReportQueue.put(ServerReport(ServerReport.ALEXA, "Send go command to all drones"))
-						elif msg.data == "stream":
+						elif msg.data == "stop":
+							command = {
+								"topic": "gcs",
+								"command": "stop",
+							}
+							
+							self.send_to_all(json.dumps(command))
+							self.serverReportQueue.put(ServerReport(ServerReport.ALEXA, "Send stop command to all drones"))
+						elif msg.data == "stream on":
 							command = {
 								"topic": "gcs",
 								"command": "stream on",
@@ -275,6 +283,47 @@ class GCSSeverThread(threading.Thread):
 							
 							self.send_to_all(json.dumps(command))
 							self.serverReportQueue.put(ServerReport(ServerReport.ALEXA, "Send stream on command to all drones"))
+						elif msg.data == "stream off":
+							command = {
+								"topic": "gcs",
+								"command": "stream off",
+							}
+							
+							self.send_to_all(json.dumps(command))
+							self.serverReportQueue.put(ServerReport(ServerReport.ALEXA, "Send stream off command to all drones"))
+						elif msg.data == "zoom in":
+							command = {
+								"topic": "gcs",
+								"command": "zoom in",
+							}
+							
+							self.send_to_all(json.dumps(command))
+							self.serverReportQueue.put(ServerReport(ServerReport.ALEXA, "Send zoom in command to all drones"))
+						elif msg.data == "zoom out":
+							command = {
+								"topic": "gcs",
+								"command": "zoom out",
+							}
+							
+							self.send_to_all(json.dumps(command))
+							self.serverReportQueue.put(ServerReport(ServerReport.ALEXA, "Send zoom out command to all drones"))
+						elif msg.data == "tracking on":
+							command = {
+								"topic": "gcs",
+								"command": "tracking on",
+							}
+							
+							self.send_to_all(json.dumps(command))
+							self.serverReportQueue.put(ServerReport(ServerReport.ALEXA, "Send tracking on command to all drones"))
+						elif msg.data == "tracking off":
+							command = {
+								"topic": "gcs",
+								"command": "tracking off",
+							}
+							
+							self.send_to_all(json.dumps(command))
+							self.serverReportQueue.put(ServerReport(ServerReport.ALEXA, "Send tracking off command to all drones"))
+
 
 		self.alexaServer.server.shutdown()
 

@@ -30,6 +30,18 @@ def make_alexa_handler_class(q):
 					q.put(ClientReport(ClientReport.ALEXA, "go"))
 				elif command == "stop":
 					q.put(ClientReport(ClientReport.ALEXA, "stop"))
+				elif command == "stream on":
+					q.put(ClientReport(ClientReport.ALEXA, "stream on"))
+				elif command == "stream off":
+					q.put(ClientReport(ClientReport.ALEXA, "stream off"))
+				elif command == "zoom in":
+					q.put(ClientReport(ClientReport.ALEXA, "zoom in"))
+				elif command == "zoom out":
+					q.put(ClientReport(ClientReport.ALEXA, "zoom out"))
+				elif command == "tracking on":
+					q.put(ClientReport(ClientReport.ALEXA, "tracking on"))
+				elif command == "tracking off":
+					q.put(ClientReport(ClientReport.ALEXA, "tracking off"))
 				self.send_response(200)
 
 				return
