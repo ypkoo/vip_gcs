@@ -32,7 +32,6 @@ class GMapWebView(QWebView):
 
 	def __init__(self, source, signal):
 		super(GMapWebView, self).__init__()
-
 		
 		file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), source))
 		local_url = QUrl.fromLocalFile(file_path)
@@ -70,18 +69,13 @@ class MainFrame(QWidget):
 		
 	
 	def frame_init(self):
-
-
 		self.droneStatusLayout = VipStatusLayout()
 
 		self.droneStatusLayout.addWidget("0")
 		self.droneStatusLayout.clicked_connect("0", self.on_dronestatus_clicked)
-
-
 		
 		self.gmapLayout = QGridLayout()
 		self.gmap = GMapWebView("gmap-drone.html", self.jsSignal)
-
 
 		self.logText = QTextEdit()
 		self.logText.setReadOnly(True)
@@ -91,29 +85,27 @@ class MainFrame(QWidget):
 			color: white;
 			padding: 10px;
 			margin-right: 20px;
+			margin-left: 10px;
 			margin-bottom: 10px;
 			border-style: solid;
 			border-color: white;
 			border-radius: 20px;""")
 
 
-
 		""" Command layout """
 		self.cmdWidget = QWidget()
-		# self.cmdWidget.hide()
-		self.cmdWidget.setStyleSheet("background-color:rgba(0, 0, 0, 0%);")
+		self.cmdWidget.setStyleSheet("""
+			background-color:rgba(0, 0, 0, 0%);
+			""")
 		self.cmdLayout = QGridLayout()
 		# self.cmdLayout.setSpacing(0)
-		self.cmdLayout.setContentsMargins(0,0,0,0)
+		self.cmdLayout.setContentsMargins(10,10,10,0)
 		self.cmdLayout.setAlignment(Qt.AlignTop)
 		self.cmdWidget.setLayout(self.cmdLayout)
 		
-
-
 		self.startBtn = VipCommandBtn("Start")
 		self.goBtn = VipCommandBtn("Go")
 		self.streamingOnBtn = VipCommandBtn("StreamOn")
-		# self.streamingOffBtn = VipCommandBtn("StreamOff")
 		self.streamingOffBtn = VipCommandBtn("StreamOff")		
 		self.trackingOnBtn = VipCommandBtn("TrackingOn")
 		self.trackingOffBtn = VipCommandBtn("TrackingOff")
@@ -122,9 +114,6 @@ class MainFrame(QWidget):
 		self.zoomOutBtn = VipCommandBtn("ZoomOut")
 		self.stopBtn = VipCommandBtn("Stop")
 
-
-
-		
 
 		# self.cmdLayout.addWidget(self.droneIDLabel, 0, 0, 1, 1)
 		# self.cmdLayout.addWidget(self.startBtn, 0, 0, 1, 1)
@@ -169,38 +158,30 @@ class MainFrame(QWidget):
 		# self.cmdLayout.setColumnStretch(3, 2)
 		# self.cmdLayout.setColumnStretch(4, 2)
 
-
-		self.sendtoallBox = QCheckBox("send to all")
-
-		# self.gmapLayout.addWidget(self.sendtoallBox, 1, 0, 1, 1)
-		self.gmapLayout.addWidget(self.gmap, 0, 0, 3, 6)
+		self.gmapLayout.addWidget(self.gmap, 0, 0, 2, 6)
 		self.gmapLayout.addWidget(self.droneStatusLayout, 0, 5, 2, 1)
-		# self.gmapLayout.addWidget(self.textCommandLayout, 1, 1, 1, 3)
-		self.gmapLayout.addWidget(self.cmdWidget, 0, 0, 3, 1)
-		self.gmapLayout.addWidget(self.logText, 2, 4, 1, 2)
-
+		self.gmapLayout.addWidget(self.cmdWidget, 0, 0, 1, 1)
+		self.gmapLayout.addWidget(self.logText, 1, 0, 1, 2)
 
 		self.gmapLayout.setColumnStretch(0, 1)
-		self.gmapLayout.setColumnStretch(1, 2)
-		self.gmapLayout.setColumnStretch(2, 2)
-		self.gmapLayout.setColumnStretch(3, 2)
-		self.gmapLayout.setColumnStretch(4, 4)
+		self.gmapLayout.setColumnStretch(1, 4)
+		self.gmapLayout.setColumnStretch(2, 1)
+		self.gmapLayout.setColumnStretch(3, 1)
+		self.gmapLayout.setColumnStretch(4, 1)
 		self.gmapLayout.setColumnStretch(5, 2)
-		self.gmapLayout.setRowStretch(0, 6)
+		self.gmapLayout.setRowStretch(0, 1)
 		self.gmapLayout.setRowStretch(1, 1)
-		self.gmapLayout.setRowStretch(2, 1)
-		
+		# self.gmapLayout.setRowStretch(2, 2)
 
 		self.gmapWidget = QWidget()
 		self.gmapWidget.setLayout(self.gmapLayout)
 
-
 		self.gridLayout = QGridLayout()
-		self.gridLayout.addWidget(self.gmapWidget, 0, 0, 2, 2)
-		self.gridLayout.setColumnStretch(0, 1)
-		self.gridLayout.setColumnStretch(1, 10)
-		self.gmapLayout.setRowStretch(0, 1)
-		self.gmapLayout.setRowStretch(1, 4)
+		self.gridLayout.addWidget(self.gmapWidget, 0, 0, 1, 1)
+		# self.gridLayout.setColumnStretch(0, 1)
+		# self.gridLayout.setColumnStretch(1, 10)
+		# self.gmapLayout.setRowStretch(0, 1)
+		# self.gmapLayout.setRowStretch(1, 4)
 
 		self.setLayout(self.gridLayout)
 		self.resize(2280, 1520)
@@ -247,7 +228,6 @@ class MainFrame(QWidget):
 		command = {
 			"topic": "gcs",
 			"command": "stream off"
-			# "command": "stream off", # kdw
 		}
 		if self.context.curSelected == "0":
 			self.server.send_to_all(json.dumps(command))
@@ -328,30 +308,6 @@ class MainFrame(QWidget):
 			self.server.send(self.context.curSelected, json.dumps(command))
 			self.logText.append(LOG("GUI", "Send stop command to drone %s" % self.context.curSelected))
 
-	def on_map_clicked(self):
-		self.stackedLayout.setCurrentIndex(0)
-		self.mapBtn.raise_()
-		self.streamingBtn.raise_()
-
-
-	def on_streaming_clicked(self):
-		self.stackedLayout.setCurrentIndex(1)
-		self.mapBtn.raise_()
-		self.streamingBtn.raise_()
-
-	def on_textcommandbtn_clicked(self):
-		textCommand = str(self.textCommand.toPlainText())
-		command = {
-				"type": "dronemanager",
-				"data": {
-							"command": "textcommand",
-							"contents": textCommand, 
-						}
-			}
-		self.server.send(self.context.curSelected, json.dumps(command))
-		text = "Send text command %s to drone %s" % (textCommand, self.context.curSelected)
-		self.logText.append(text)
-
 
 	def gcs_server_init(self):
 		self.logText.append(LOG("GCS", "Connecting to the server..."))
@@ -365,8 +321,6 @@ class MainFrame(QWidget):
 		self.server.start()
 
 	def js_signal_handler(self, msg_):
-
-
 		msg = str(msg_).split()
 		print msg
 
@@ -385,8 +339,6 @@ class MainFrame(QWidget):
 
 	def on_dronestatus_clicked(self, id_):
 		self.context.curSelected = id_
-
-
 
 
 	def on_server_timer(self):
@@ -415,36 +367,19 @@ class MainFrame(QWidget):
 		for drone in self.server.droneList:
 			info = drone.drone.get_info()
 
-
 			self.droneStatusLayout.setStatus(info)
 			self.gmap.frame.evaluateJavaScript('update_marker(%s, %s, %s)' % (info['id'], info['location']['lat'], info['location']['lng']))
-
-
-
 
 
 
 if __name__ == '__main__':
 	signal.signal(signal.SIGINT, signal.SIG_DFL)
 	app = QApplication(sys.argv)
-	QFontDatabase.addApplicationFont("/home/ypkoo/VIP_GCS/fonts/Lato/Lato-Light.ttf")
-	QFontDatabase.addApplicationFont("/home/ypkoo/VIP_GCS/fonts/Lato/Lato-Bold.ttf")
-	QFontDatabase.addApplicationFont("/home/ypkoo/VIP_GCS/fonts/Open_Sans/OpenSans-Light.ttf")
-
 
 	style = QSSHelper.open_qss('style.qss')
 	app.setStyleSheet(style)
 	frame = MainFrame()
 	frame.show()
-	# try:
-	# 	while True:
-	# 		time.sleep(.1)
-	# except KeyboardInterrupt:
-	# 	print "KeyboardInterrupt"
-	# 	sys.exit(app.exec_())
 
 	sys.exit(app.exec_())
 	app.quit()
-
-
-	

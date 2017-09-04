@@ -40,13 +40,11 @@ function initMap() {
 	map.addListener('click', map_clicked);
 
 	//Locations of the GCS
-	gcsMarker = new google.maps.Marker({
-		position: GCSLatLng,
-		map: map,
-		icon: icons_url['home']
-	});
-
-	console.log("hello");
+	// gcsMarker = new google.maps.Marker({
+	// 	position: GCSLatLng,
+	// 	map: map,
+	// 	icon: icons_url['home']
+	// });
 }
 
 // map listener
