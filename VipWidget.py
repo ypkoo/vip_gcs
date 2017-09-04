@@ -220,7 +220,8 @@ lat: %s
 lng: %s
 alt: %s
 yaw: %s
-""" % (info['id'], info['location']['lat'], info['location']['lng'], info['location']['alt'], info['yaw'])
+battery: %s%%
+""" % (info['id'], info['location']['lat'], info['location']['lng'], info['location']['alt'], info['yaw'], info['battery'])
 		
 		# text = "Drone %s" % info['id']
 		self.statusText.setText(text)

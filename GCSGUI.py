@@ -70,37 +70,13 @@ class MainFrame(QWidget):
 		
 	
 	def frame_init(self):
-		self.navBar = VipNavBar()
-		self.stackedLayout = QStackedWidget()
 
-		self.mapBtn = VipNavBarBtn(
-			icon_default = QIcon('image/navi_white.png'),
-			icon_hover = QIcon('image/navi_hover.png'),
-			icon_others_hover = QIcon('image/map.png'))
-		self.streamingBtn = VipNavBarBtn(
-			icon_default = QIcon('image/video_white.png'),
-			icon_hover = QIcon('image/video_hover.png'),
-			icon_others_hover = QIcon('image/video.png'))
-		self.Btn1 = VipNavBarBtn(
-			icon_default = QIcon('image/navi_white.png'),
-			icon_hover = QIcon('image/navi_hover.png'),
-			icon_others_hover = QIcon('image/map.png'))
-		self.Btn2 = VipNavBarBtn(
-			icon_default = QIcon('image/video_white.png'),
-			icon_hover = QIcon('image/video_hover.png'),
-			icon_others_hover = QIcon('image/video.png'))
-		
-		self.navBar.add_btn(self.mapBtn)
-		self.navBar.add_btn(self.streamingBtn)
 
 		self.droneStatusLayout = VipStatusLayout()
 
 		self.droneStatusLayout.addWidget("0")
 		self.droneStatusLayout.clicked_connect("0", self.on_dronestatus_clicked)
 
-
-		self.streamingBtn.clicked.connect(self.on_streaming_clicked)
-		self.mapBtn.clicked.connect(self.on_map_clicked)
 
 		
 		self.gmapLayout = QGridLayout()
@@ -138,7 +114,7 @@ class MainFrame(QWidget):
 		self.goBtn = VipCommandBtn("Go")
 		self.streamingOnBtn = VipCommandBtn("StreamOn")
 		# self.streamingOffBtn = VipCommandBtn("StreamOff")
-		self.streamingOffBtn = VipCommandBtn("Redetect")		
+		self.streamingOffBtn = VipCommandBtn("StreamOff")		
 		self.trackingOnBtn = VipCommandBtn("TrackingOn")
 		self.trackingOffBtn = VipCommandBtn("TrackingOff")
 		self.redetectBtn = VipCommandBtn("Redetect")
@@ -146,23 +122,7 @@ class MainFrame(QWidget):
 		self.zoomOutBtn = VipCommandBtn("ZoomOut")
 		self.stopBtn = VipCommandBtn("Stop")
 
-		self.droneInfo = QWidget()
-		self.droneInfo.setStyleSheet("""
-			background-color:rgba(0, 0, 0, 50%);
-			color: white;
-			margin-left: 10px;
-			margin-bottom: 10px;
-			border: 1px solid white;
-			border-radius: 20px;""")
-		self.droneInfoLayout = QGridLayout()
-		self.droneInfo.setLayout(self.droneInfoLayout)
-		self.textCommand = QTextEdit()
-		self.textCommandBtn = QPushButton("send")
-		self.curDroneLabel = QLabel()
-		self.droneInfoLayout.addWidget(self.curDroneLabel, 0, 0)
-		self.droneInfoLayout.addWidget(self.textCommand, 1, 0)
-		self.droneInfoLayout.addWidget(self.textCommandBtn, 1, 1)
-		self.textCommandBtn.clicked.connect(self.on_textcommandbtn_clicked)
+
 
 		
 
@@ -224,7 +184,7 @@ class MainFrame(QWidget):
 		self.gmapLayout.setColumnStretch(1, 2)
 		self.gmapLayout.setColumnStretch(2, 2)
 		self.gmapLayout.setColumnStretch(3, 2)
-		self.gmapLayout.setColumnStretch(4, 2)
+		self.gmapLayout.setColumnStretch(4, 4)
 		self.gmapLayout.setColumnStretch(5, 2)
 		self.gmapLayout.setRowStretch(0, 6)
 		self.gmapLayout.setRowStretch(1, 1)
@@ -233,18 +193,10 @@ class MainFrame(QWidget):
 
 		self.gmapWidget = QWidget()
 		self.gmapWidget.setLayout(self.gmapLayout)
-		self.stackedLayout.addWidget(self.gmapWidget)
 
-		self.streaming = QWidget()
-		self.streaming.setStyleSheet("""
-			background-color:rgba(130, 100, 50, 50%);
-			border-color: rgb(255,255,255);
-			border: none;""")
-		self.stackedLayout.addWidget(self.streaming)
 
 		self.gridLayout = QGridLayout()
-		self.gridLayout.addWidget(self.stackedLayout, 0, 0, 2, 2)
-		# self.gridLayout.addWidget(self.navBar, 0, 0, 1, 1)
+		self.gridLayout.addWidget(self.gmapWidget, 0, 0, 2, 2)
 		self.gridLayout.setColumnStretch(0, 1)
 		self.gridLayout.setColumnStretch(1, 10)
 		self.gmapLayout.setRowStretch(0, 1)
@@ -446,8 +398,7 @@ class MainFrame(QWidget):
 				
 			elif serverReport.type == ServerReport.NEW:
 				self.logText.append(LOG("Server", 'A new drone %s is connected.' % serverReport.data))
-				# if serverReport.data == "1":
-				# 	self.context.isM600Connected = True
+
 				self.droneStatusLayout.addWidget(serverReport.data)
 				self.droneStatusLayout.clicked_connect(serverReport.data, self.on_dronestatus_clicked)
 			elif serverReport.type == ServerReport.TERMINATE:

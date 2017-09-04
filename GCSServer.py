@@ -104,7 +104,11 @@ class DroneClientThread(threading.Thread):
 		while self.alive.isSet():
 			raw_data = self._socket.recv(2048)
 			if raw_data:
-				data = json.loads(raw_data) # kokoga mondai
+				try:
+					data = json.loads(raw_data) # kokoga mondai
+				except Exception as e:
+					print type(e)
+					continue
 				if self.drone:
 					
 					self._update_drone(data)
@@ -243,11 +247,12 @@ class GCSSeverThread(threading.Thread):
 						self.serverReportQueue.put(ServerReport(ServerReport.NEW, msg.data.drone.id))
 						# self.serverReportQueue.put(ServerReport(ServerReport.TEXT, text))
 					elif msg.type == ClientReport.TERMINATE:
-						text = 'Drone %s connection closed.' % msg.data.drone.id
-						self.droneList.remove(msg.data)
-						msg.data.join()
-						# self.serverReportQueue.put(ServerReport(ServerReport.TEXT, text))
-						self.serverReportQueue.put(ServerReport(ServerReport.TERMINATE, msg.data.drone.id))
+						if msg.data.drone is not None:
+							text = 'Drone %s connection closed.' % msg.data.drone.id
+							self.droneList.remove(msg.data)
+							msg.data.join()
+							# self.serverReportQueue.put(ServerReport(ServerReport.TEXT, text))
+							self.serverReportQueue.put(ServerReport(ServerReport.TERMINATE, msg.data.drone.id))
 					elif msg.type == ClientReport.ALEXA:
 						if msg.data == "start":
 							
