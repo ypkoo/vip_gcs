@@ -107,6 +107,7 @@ class DroneClientThread(threading.Thread):
 				try:
 					data = json.loads(raw_data) # kokoga mondai
 				except Exception as e:
+					print raw_data
 					print type(e)
 					continue
 				if self.drone:
