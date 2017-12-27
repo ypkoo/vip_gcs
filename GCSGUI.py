@@ -115,17 +115,6 @@ class MainFrame(QWidget):
 		self.stopBtn = VipCommandBtn("Stop")
 
 
-		# self.cmdLayout.addWidget(self.droneIDLabel, 0, 0, 1, 1)
-		# self.cmdLayout.addWidget(self.startBtn, 0, 0, 1, 1)
-		# self.cmdLayout.addWidget(self.goBtn, 1, 0, 1, 1)
-		# self.cmdLayout.addWidget(self.streamingOnBtn, 0, 1, 1, 1)
-		# self.cmdLayout.addWidget(self.streamingOffBtn, 1, 1, 1, 1)
-		# self.cmdLayout.addWidget(self.trackingOnBtn, 0, 2, 1, 1)
-		# self.cmdLayout.addWidget(self.trackingOffBtn, 1, 2, 1, 1)
-		# self.cmdLayout.addWidget(self.zoomInBtn, 0, 3, 1, 1)
-		# self.cmdLayout.addWidget(self.zoomOutBtn, 1, 3, 1, 1)
-		# self.cmdLayout.addWidget(self.redetectBtn, 0, 4, 1, 1)
-		# self.cmdLayout.addWidget(self.stopBtn, 1, 4, 1, 1)
 
 		self.cmdLayout.addWidget(self.startBtn, 0, 0, 1, 1)
 		self.cmdLayout.addWidget(self.goBtn, 1, 0, 1, 1)
@@ -150,13 +139,6 @@ class MainFrame(QWidget):
 		self.redetectBtn.clicked.connect(self.on_redetectbtn_clicked)
 		self.stopBtn.clicked.connect(self.on_stopbtn_clicked)
 
-		# self.cmdLayout.setRowStretch(0, 2)
-		# self.cmdLayout.setRowStretch(1, 10)
-		# self.cmdLayout.setColumnStretch(0, 2)
-		# self.cmdLayout.setColumnStretch(1, 2)
-		# self.cmdLayout.setColumnStretch(2, 2)
-		# self.cmdLayout.setColumnStretch(3, 2)
-		# self.cmdLayout.setColumnStretch(4, 2)
 
 		self.gmapLayout.addWidget(self.gmap, 0, 0, 2, 6)
 		self.gmapLayout.addWidget(self.droneStatusLayout, 0, 5, 2, 1)
