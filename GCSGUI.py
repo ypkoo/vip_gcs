@@ -1,7 +1,9 @@
-from PyQt4.QtGui import *
-from PyQt4.QtCore import *
-from PyQt4.QtWebKit import QWebView, QWebPage
-from PyQt4.QtNetwork import QNetworkAccessManager, QNetworkRequest
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
+# from PyQt5.QtWebKit import QWebView, QWebPage
+from PyQt5.QtWebEngineWidgets import QWebEngineView
+from PyQt5.QtWebChannel import QWebChannel
+from PyQt5.QtNetwork import QNetworkAccessManager, QNetworkRequest
 from VipWidget import *
 from GCSServer import *
 
@@ -27,21 +29,41 @@ class JSCommunicator(QObject):
 	def emit_signal(self, msg):
 		self.signal.emit(msg)
 
-
-class GMapWebView(QWebView):
+class GMapWebEngineView(QWebEngineView):
 
 	def __init__(self, source, signal):
-		super(GMapWebView, self).__init__()
-		
-		file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), source))
+		super(GMapWebEngineView, self).__init__()
+
+		file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "gmap-drone.html"))
 		local_url = QUrl.fromLocalFile(file_path)
-		self.load(local_url)
+		# self.load(local_url)
+		self.setUrl(local_url)
+		# self.signal = signal
+		self.jsCommunicator = JSCommunicator(signal)
 
-		self.signal = signal
-		self.jsCommunicator = JSCommunicator(self.signal)
+		self.channel = QWebChannel()
+		self.channel.registerObject('jsCommunicator', self.jsCommunicator)
 
-		self.frame = self.page().mainFrame()
-		self.frame.addToJavaScriptWindowObject('jsCommunicator', self.jsCommunicator)
+		self.page = self.page()
+		self.page.setWebChannel(self.channel)
+
+		# self.frame = self.page().mainFrame()
+		# self.frame.addToJavaScriptWindowObject('jsCommunicator', self.jsCommunicator)
+
+# class GMapWebView(QWebView):
+
+# 	def __init__(self, source, signal):
+# 		super(GMapWebView, self).__init__()
+# 		# url = QtCore.QUrl(https://maps.googleapis.com/maps/api/geocode/xml?key=AIzaSyCj8fpuSji61673_0wos64u8yuWJuK3k8)
+# 		file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), source))
+# 		local_url = QUrl.fromLocalFile(file_path)
+# 		self.load(local_url)
+
+# 		self.signal = signal
+# 		self.jsCommunicator = JSCommunicator(self.signal)
+
+# 		self.frame = self.page().mainFrame()
+# 		self.frame.addToJavaScriptWindowObject('jsCommunicator', self.jsCommunicator)
 
 
 class VipContext(object):
@@ -75,7 +97,7 @@ class MainFrame(QWidget):
 		self.droneStatusLayout.clicked_connect("0", self.on_dronestatus_clicked)
 		
 		self.gmapLayout = QGridLayout()
-		self.gmap = GMapWebView("gmap-drone.html", self.jsSignal)
+		self.gmap = GMapWebEngineView("gmap-drone.html", self.jsSignal)
 
 		self.logText = QTextEdit()
 		self.logText.setReadOnly(True)
@@ -322,7 +344,7 @@ class MainFrame(QWidget):
 
 	def js_signal_handler(self, msg_):
 		msg = str(msg_).split()
-		print msg
+		print (msg)
 
 		if msg[0] == "marker_click_event":
 			self.context.lat = msg[1]
@@ -360,7 +382,7 @@ class MainFrame(QWidget):
 			elif serverReport.type == ServerReport.ALEXA:
 				self.logText.append(LOG("Alexa", serverReport.data))
 
-		except Queue.Empty as e:
+		except queue.Empty as e:
 			pass
 
 
@@ -368,8 +390,8 @@ class MainFrame(QWidget):
 			info = drone.drone.get_info()
 
 			self.droneStatusLayout.setStatus(info)
-			self.gmap.frame.evaluateJavaScript('update_marker(%s, %s, %s)' % (info['id'], info['location']['lat'], info['location']['lng']))
-
+			# self.gmap.frame.evaluateJavaScript('update_marker(%s, %s, %s)' % (info['id'], info['location']['lat'], info['location']['lng']))
+			self.gmap.page.runJavaScript('update_marker(%s, %s, %s)' % (info['id'], info['location']['lat'], info['location']['lng']))
 
 
 if __name__ == '__main__':

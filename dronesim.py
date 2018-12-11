@@ -1,4 +1,4 @@
-import socket, Queue, threading, time, random, sys, json, select, GCSServer, datetime
+import socket, queue, threading, time, random, sys, json, select, GCSServer, datetime
 
 ADDR = ("127.0.0.1", 43211)
 id_ = sys.argv[1]
@@ -33,13 +33,13 @@ class DroneSim(threading.Thread):
 				},
 			}
 			# time.sleep(10)
-			self.s.send(json.dumps(data))
+			self.s.send(json.dumps(data).encode())
 			# recv_data = self.s.recv(2048)
 			# print "data sent: ", data
 			ready = select.select([self.s], [], [], 0.1)
 			if ready[0]:
 				recv_data = self.s.recv(2048)
-				print "received data: ", recv_data
+				print ("received data: ", recv_data)
 			else:
 				continue
 		self.s.close()
@@ -48,7 +48,7 @@ class DroneSim(threading.Thread):
 		self.s.connect(ADDR)
 		self.s.setblocking(0)
 		# self.s.settimeout(.2)
-		print "connected to", ADDR
+		print ("connected to", ADDR)
 
 
 if __name__ == "__main__":
@@ -59,7 +59,7 @@ if __name__ == "__main__":
 		while True:
 			time.sleep(.1)
 	except KeyboardInterrupt:
-		print "KeyboardInterrupt"
+		print ("KeyboardInterrupt")
 
 		drone.alive.clear()
 

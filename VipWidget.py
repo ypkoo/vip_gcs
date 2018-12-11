@@ -1,5 +1,6 @@
-from PyQt4.QtGui import *
-from PyQt4.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
 
 class VipNavBar(QWidget):
 	def __init__(self):
@@ -70,10 +71,14 @@ class VipNavBarBtn(QPushButton):
 		self.setIcon(self.icon_others_hover)
 		pass
 
+class DroneStatusClicked(QObject):
+	signal = pyqtSignal()
+
 class VipStatusLayout(QWidget):
 	def __init__(self):
 		super(VipStatusLayout, self).__init__()
 
+		signal = pyqtSignal(object)
 		self._droneStatusList = []
 
 		self._layout = QVBoxLayout()
@@ -140,7 +145,8 @@ class VipStatusLayout(QWidget):
 
 	def clicked_connect(self, id_, targetFunc):
 		target = self._drone_by_id(id_)
-		QObject.connect(target, SIGNAL("droneStatusClicked"), targetFunc)
+		target.signal.connect(targetFunc)
+		# QObject.connect(target, SIGNAL("droneStatusClicked"), targetFunc)
 
 	def _drone_by_id(self, id_):
 		for droneStatus in self._droneStatusList:
@@ -171,6 +177,7 @@ class VipStatusLayout(QWidget):
 # 		self.emit(SIGNAL("droneStatusClicked"), self.id)
 
 class VipDroneStatus(QWidget):
+	signal = pyqtSignal(str)
 	def __init__(self, id_):
 		super(VipDroneStatus, self).__init__()
 
@@ -230,7 +237,10 @@ battery: %s%%
 		self.setCursor(QCursor(Qt.PointingHandCursor))
 
 	def mouseReleaseEvent(self, event):
-		self.emit(SIGNAL("droneStatusClicked"), self.id)
+		# self.emit(SIGNAL("droneStatusClicked"), self.id)
+		self.signal.emit(self.id)
+
+
 
 
 

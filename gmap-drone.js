@@ -15,6 +15,8 @@ var demo = {lat: 36.3697, lng: 127.3614};
 // 	'yellow': 'http://localhost:8000/map-icons/icon-gcs2-blue.png'
 // }
 
+
+
 var MAN = true
 
 var icons_url = {
@@ -28,7 +30,12 @@ var icons_url = {
 
 // Initialize the map. Called when this file is loaded.
 function initMap() {
-	var GCSLatLng = demo;
+	console.log("Start!!!");
+
+	new QWebChannel(qt.webChannelTransport, function (channel) {
+	    window.jsCommunicator = channel.objects.jsCommunicator;
+	});
+	var GCSLatLng = N1GPS;
 
 	map = new google.maps.Map(document.getElementById('map'), {
 		center: GCSLatLng,
@@ -36,6 +43,7 @@ function initMap() {
 		mapTypeId: google.maps.MapTypeId.SATELLITE,
 		disableDefaultUI: true
 	});
+
 
 	map.addListener('click', map_clicked);
 
