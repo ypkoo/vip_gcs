@@ -152,14 +152,14 @@ class MainFrame(QWidget):
 
 		self.cmdLayout.addWidget(self.startBtn, 0, 0, 1, 1)
 		self.cmdLayout.addWidget(self.goBtn, 1, 0, 1, 1)
-		self.cmdLayout.addWidget(self.streamingOnBtn, 2, 0, 1, 1)
-		self.cmdLayout.addWidget(self.streamingOffBtn, 3, 0, 1, 1)
-		self.cmdLayout.addWidget(self.trackingOnBtn, 4, 0, 1, 1)
-		self.cmdLayout.addWidget(self.trackingOffBtn, 5, 0, 1, 1)
-		self.cmdLayout.addWidget(self.zoomInBtn, 6, 0, 1, 1)
-		self.cmdLayout.addWidget(self.zoomOutBtn, 7, 0, 1, 1)
-		self.cmdLayout.addWidget(self.redetectBtn, 8, 0, 1, 1)
-		self.cmdLayout.addWidget(self.stopBtn, 9, 0, 1, 1)
+		# self.cmdLayout.addWidget(self.streamingOnBtn, 2, 0, 1, 1)
+		# self.cmdLayout.addWidget(self.streamingOffBtn, 3, 0, 1, 1)
+		# self.cmdLayout.addWidget(self.trackingOnBtn, 4, 0, 1, 1)
+		# self.cmdLayout.addWidget(self.trackingOffBtn, 5, 0, 1, 1)
+		# self.cmdLayout.addWidget(self.zoomInBtn, 6, 0, 1, 1)
+		# self.cmdLayout.addWidget(self.zoomOutBtn, 7, 0, 1, 1)
+		# self.cmdLayout.addWidget(self.redetectBtn, 8, 0, 1, 1)
+		self.cmdLayout.addWidget(self.stopBtn, 2, 0, 1, 1)
 
 
 		self.startBtn.clicked.connect(self.on_startbtn_clicked)
@@ -192,7 +192,7 @@ class MainFrame(QWidget):
 		self.gmapLayout.setColumnStretch(3, 1)
 		self.gmapLayout.setColumnStretch(4, 1)
 		self.gmapLayout.setColumnStretch(5, 2)
-		self.gmapLayout.setRowStretch(0, 1)
+		self.gmapLayout.setRowStretch(0, 3)
 		self.gmapLayout.setRowStretch(1, 1)
 		# self.gmapLayout.setRowStretch(2, 2)
 
