@@ -33,7 +33,6 @@ class GMapWebEngineView(QWebEngineView):
 
 	def __init__(self, source, signal):
 		super(GMapWebEngineView, self).__init__()
-
 		file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "gmap-drone.html"))
 		local_url = QUrl.fromLocalFile(file_path)
 		# self.load(local_url)
@@ -46,6 +45,7 @@ class GMapWebEngineView(QWebEngineView):
 
 		self.page = self.page()
 		self.page.setWebChannel(self.channel)
+
 
 		# self.frame = self.page().mainFrame()
 		# self.frame.addToJavaScriptWindowObject('jsCommunicator', self.jsCommunicator)
@@ -97,6 +97,7 @@ class MainFrame(QWidget):
 		self.droneStatusLayout.clicked_connect("0", self.on_dronestatus_clicked)
 		
 		self.gmapLayout = QGridLayout()
+		
 		self.gmap = GMapWebEngineView("gmap-drone.html", self.jsSignal)
 
 		self.logText = QTextEdit()
@@ -402,6 +403,7 @@ if __name__ == '__main__':
 	app.setStyleSheet(style)
 	frame = MainFrame()
 	frame.show()
+	# frame.showFullScreen()
 
 	sys.exit(app.exec_())
 	app.quit()
