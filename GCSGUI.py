@@ -50,21 +50,6 @@ class GMapWebEngineView(QWebEngineView):
 		# self.frame = self.page().mainFrame()
 		# self.frame.addToJavaScriptWindowObject('jsCommunicator', self.jsCommunicator)
 
-# class GMapWebView(QWebView):
-
-# 	def __init__(self, source, signal):
-# 		super(GMapWebView, self).__init__()
-# 		# url = QtCore.QUrl(https://maps.googleapis.com/maps/api/geocode/xml?key=AIzaSyCj8fpuSji61673_0wos64u8yuWJuK3k8)
-# 		file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), source))
-# 		local_url = QUrl.fromLocalFile(file_path)
-# 		self.load(local_url)
-
-# 		self.signal = signal
-# 		self.jsCommunicator = JSCommunicator(self.signal)
-
-# 		self.frame = self.page().mainFrame()
-# 		self.frame.addToJavaScriptWindowObject('jsCommunicator', self.jsCommunicator)
-
 
 class VipContext(object):
 
@@ -126,60 +111,22 @@ class MainFrame(QWidget):
 		self.cmdLayout.setAlignment(Qt.AlignTop)
 		self.cmdWidget.setLayout(self.cmdLayout)
 		
+		self.takeoffBtn = VipCommandBtn("Take off")
 		self.startBtn = VipCommandBtn("Start")
-		self.goBtn = VipCommandBtn("Go")
-		self.streamingOnBtn = VipCommandBtn("StreamOn")
-		self.streamingOffBtn = VipCommandBtn("StreamOff")		
-		self.trackingOnBtn = VipCommandBtn("TrackingOn")
-		self.trackingOffBtn = VipCommandBtn("TrackingOff")
-		self.redetectBtn = VipCommandBtn("Redetect")
-		self.zoomInBtn = VipCommandBtn("ZoomIn")
-		self.zoomOutBtn = VipCommandBtn("ZoomOut")
-		self.stopBtn = VipCommandBtn("Stop")
+		self.landBtn = VipCommandBtn("Land")
+		self.resetBtn = VipCommandBtn("Reset")
+
+		self.cmdLayout.addWidget(self.takeoffBtn, 0, 0, 1, 1)
+		self.cmdLayout.addWidget(self.startBtn, 1, 0, 1, 1)
+		self.cmdLayout.addWidget(self.landBtn, 2, 0, 1, 1)
+		self.cmdLayout.addWidget(self.resetBtn, 3, 0, 1, 1)
 
 
-		# self.cmdLayout.addWidget(self.droneIDLabel, 0, 0, 1, 1)
-		# self.cmdLayout.addWidget(self.startBtn, 0, 0, 1, 1)
-		# self.cmdLayout.addWidget(self.goBtn, 1, 0, 1, 1)
-		# self.cmdLayout.addWidget(self.streamingOnBtn, 0, 1, 1, 1)
-		# self.cmdLayout.addWidget(self.streamingOffBtn, 1, 1, 1, 1)
-		# self.cmdLayout.addWidget(self.trackingOnBtn, 0, 2, 1, 1)
-		# self.cmdLayout.addWidget(self.trackingOffBtn, 1, 2, 1, 1)
-		# self.cmdLayout.addWidget(self.zoomInBtn, 0, 3, 1, 1)
-		# self.cmdLayout.addWidget(self.zoomOutBtn, 1, 3, 1, 1)
-		# self.cmdLayout.addWidget(self.redetectBtn, 0, 4, 1, 1)
-		# self.cmdLayout.addWidget(self.stopBtn, 1, 4, 1, 1)
-
-		self.cmdLayout.addWidget(self.startBtn, 0, 0, 1, 1)
-		self.cmdLayout.addWidget(self.goBtn, 1, 0, 1, 1)
-		# self.cmdLayout.addWidget(self.streamingOnBtn, 2, 0, 1, 1)
-		# self.cmdLayout.addWidget(self.streamingOffBtn, 3, 0, 1, 1)
-		# self.cmdLayout.addWidget(self.trackingOnBtn, 4, 0, 1, 1)
-		# self.cmdLayout.addWidget(self.trackingOffBtn, 5, 0, 1, 1)
-		# self.cmdLayout.addWidget(self.zoomInBtn, 6, 0, 1, 1)
-		# self.cmdLayout.addWidget(self.zoomOutBtn, 7, 0, 1, 1)
-		# self.cmdLayout.addWidget(self.redetectBtn, 8, 0, 1, 1)
-		self.cmdLayout.addWidget(self.stopBtn, 2, 0, 1, 1)
-
-
+		self.takeoffBtn.clicked.connect(self.on_takeoffbtn_clicked)
 		self.startBtn.clicked.connect(self.on_startbtn_clicked)
-		self.goBtn.clicked.connect(self.on_gobtn_clicked)
-		self.streamingOnBtn.clicked.connect(self.on_streamingonbtn_clicked)
-		self.streamingOffBtn.clicked.connect(self.on_streamingoffbtn_clicked)
-		self.trackingOnBtn.clicked.connect(self.on_trackingonbtn_clicked)
-		self.trackingOffBtn.clicked.connect(self.on_trackingoffbtn_clicked)
-		self.zoomInBtn.clicked.connect(self.on_zoominbtn_clicked)
-		self.zoomOutBtn.clicked.connect(self.on_zoomoutbtn_clicked)
-		self.redetectBtn.clicked.connect(self.on_redetectbtn_clicked)
-		self.stopBtn.clicked.connect(self.on_stopbtn_clicked)
+		self.landBtn.clicked.connect(self.on_landbtn_clicked)
+		self.resetBtn.clicked.connect(self.on_resetbtn_clicked)
 
-		# self.cmdLayout.setRowStretch(0, 2)
-		# self.cmdLayout.setRowStretch(1, 10)
-		# self.cmdLayout.setColumnStretch(0, 2)
-		# self.cmdLayout.setColumnStretch(1, 2)
-		# self.cmdLayout.setColumnStretch(2, 2)
-		# self.cmdLayout.setColumnStretch(3, 2)
-		# self.cmdLayout.setColumnStretch(4, 2)
 
 		self.gmapLayout.addWidget(self.gmap, 0, 0, 2, 6)
 		self.gmapLayout.addWidget(self.droneStatusLayout, 0, 5, 2, 1)
@@ -191,7 +138,7 @@ class MainFrame(QWidget):
 		self.gmapLayout.setColumnStretch(2, 1)
 		self.gmapLayout.setColumnStretch(3, 1)
 		self.gmapLayout.setColumnStretch(4, 1)
-		self.gmapLayout.setColumnStretch(5, 2)
+		self.gmapLayout.setColumnStretch(5, 1)
 		self.gmapLayout.setRowStretch(0, 3)
 		self.gmapLayout.setRowStretch(1, 1)
 		# self.gmapLayout.setRowStretch(2, 2)
@@ -209,6 +156,19 @@ class MainFrame(QWidget):
 		self.setLayout(self.gridLayout)
 		self.resize(2280, 1520)
 
+	def on_takeoffbtn_clicked(self):
+		command = {
+			"topic": "gcs",
+			"command": "takeoff",
+		}
+		
+		if self.context.curSelected == "0":
+			self.server.send_to_all(json.dumps(command))
+			self.logText.append(LOG("GUI", "Send takeoff command to all drones"))
+		else:
+			self.server.send(self.context.curSelected, json.dumps(command))
+			self.logText.append(LOG("GUI", "Send takeoff command to drone %s" % self.context.curSelected))
+
 	def on_startbtn_clicked(self):
 		command = {
 			"topic": "gcs",
@@ -222,114 +182,30 @@ class MainFrame(QWidget):
 			self.server.send(self.context.curSelected, json.dumps(command))
 			self.logText.append(LOG("GUI", "Send start command to drone %s" % self.context.curSelected))
 
-	def on_gobtn_clicked(self):
+	def on_landbtn_clicked(self):
 		command = {
 			"topic": "gcs",
-			"command": "go",
+			"command": "land",
 		}
 		if self.context.curSelected == "0":
 			self.server.send_to_all(json.dumps(command))
-			self.logText.append(LOG("GUI", "Send go command to all drones"))
+			self.logText.append(LOG("GUI", "Send land command to all drones"))
 		else:
 			self.server.send(self.context.curSelected, json.dumps(command))
-			self.logText.append(LOG("GUI", "Send go command to drone %s" % self.context.curSelected))
+			self.logText.append(LOG("GUI", "Send land command to drone %s" % self.context.curSelected))
 
-	def on_streamingonbtn_clicked(self):
+
+	def on_resetbtn_clicked(self):
 		command = {
 			"topic": "gcs",
-			"command": "stream on",
-		}
-
-		if self.context.curSelected == "0":
-			self.server.send_to_all(json.dumps(command))
-			self.logText.append(LOG("GUI", "Send streaming on command to all drones"))
-		else:
-			self.server.send(self.context.curSelected, json.dumps(command))
-			self.logText.append(LOG("GUI", "Send streaming on command to drone %s" % self.context.curSelected))
-
-	def on_streamingoffbtn_clicked(self):
-		command = {
-			"topic": "gcs",
-			"command": "stream off"
+			"command": "reset",
 		}
 		if self.context.curSelected == "0":
 			self.server.send_to_all(json.dumps(command))
-			self.logText.append(LOG("GUI", "Send streaming off command to all drones"))
+			self.logText.append(LOG("GUI", "Send reset command to all drones"))
 		else:
 			self.server.send(self.context.curSelected, json.dumps(command))
-			self.logText.append(LOG("GUI", "Send streaming off command to drone %s" % self.context.curSelected))
-
-	def on_trackingonbtn_clicked(self):
-		command = {
-			"topic": "gcs",
-			"command": "tracking on",
-		}
-		if self.context.curSelected == "0":
-			self.server.send_to_all(json.dumps(command))
-			self.logText.append(LOG("GUI", "Send tracking on command to all drones"))
-		else:
-			self.server.send(self.context.curSelected, json.dumps(command))
-			self.logText.append(LOG("GUI", "Send tracking on command to drone %s" % self.context.curSelected))
-
-	def on_trackingoffbtn_clicked(self):
-		command = {
-			"topic": "gcs",
-			"command": "tracking off",
-		}
-		if self.context.curSelected == "0":
-			self.server.send_to_all(json.dumps(command))
-			self.logText.append(LOG("GUI", "Send tracking off command to all drones"))
-		else:
-			self.server.send(self.context.curSelected, json.dumps(command))
-			self.logText.append(LOG("GUI", "Send tracking off command to drone %s" % self.context.curSelected))
-
-	def on_zoominbtn_clicked(self):
-		command = {
-			"topic": "gcs",
-			"command": "zoom in",
-		}
-		if self.context.curSelected == "0":
-			self.server.send_to_all(json.dumps(command))
-			self.logText.append(LOG("GUI", "Send zoom in command to all drones"))
-		else:
-			self.server.send(self.context.curSelected, json.dumps(command))
-			self.logText.append(LOG("GUI", "Send zoom in command to drone %s" % self.context.curSelected))
-
-	def on_zoomoutbtn_clicked(self):
-		command = {
-			"topic": "gcs",
-			"command": "zoom out",
-		}
-		if self.context.curSelected == "0":
-			self.server.send_to_all(json.dumps(command))
-			self.logText.append(LOG("GUI", "Send zoom out command to all drones"))
-		else:
-			self.server.send(self.context.curSelected, json.dumps(command))
-			self.logText.append(LOG("GUI", "Send zoom out command to drone %s" % self.context.curSelected))
-
-	def on_redetectbtn_clicked(self):
-		command = {
-			"topic": "gcs",
-			"command": "redetect",
-		}
-		if self.context.curSelected == "0":
-			self.server.send_to_all(json.dumps(command))
-			self.logText.append(LOG("GUI", "Send redetect command to all drones"))
-		else:
-			self.server.send(self.context.curSelected, json.dumps(command))
-			self.logText.append(LOG("GUI", "Send redetect command to drone %s" % self.context.curSelected))
-
-	def on_stopbtn_clicked(self):
-		command = {
-			"topic": "gcs",
-			"command": "stop",
-		}
-		if self.context.curSelected == "0":
-			self.server.send_to_all(json.dumps(command))
-			self.logText.append(LOG("GUI", "Send stop command to all drones"))
-		else:
-			self.server.send(self.context.curSelected, json.dumps(command))
-			self.logText.append(LOG("GUI", "Send stop command to drone %s" % self.context.curSelected))
+			self.logText.append(LOG("GUI", "Send reset command to drone %s" % self.context.curSelected))
 
 
 	def gcs_server_init(self):
@@ -377,7 +253,7 @@ class MainFrame(QWidget):
 				self.droneStatusLayout.addWidget(serverReport.data)
 				self.droneStatusLayout.clicked_connect(serverReport.data, self.on_dronestatus_clicked)
 			elif serverReport.type == ServerReport.TERMINATE:
-				self.gmap.frame.evaluateJavaScript('remove_marker(%s)' % serverReport.data)
+				self.gmap.page.runJavaScript('remove_marker(%s)' % serverReport.data)
 				self.droneStatusLayout.removeWidget(serverReport.data)
 				self.logText.append(LOG("Server", 'Drone %s connection closed.' % serverReport.data))
 			elif serverReport.type == ServerReport.ALEXA:
@@ -391,7 +267,6 @@ class MainFrame(QWidget):
 			info = drone.drone.get_info()
 
 			self.droneStatusLayout.setStatus(info)
-			# self.gmap.frame.evaluateJavaScript('update_marker(%s, %s, %s)' % (info['id'], info['location']['lat'], info['location']['lng']))
 			self.gmap.page.runJavaScript('update_marker(%s, %s, %s)' % (info['id'], info['location']['lat'], info['location']['lng']))
 
 

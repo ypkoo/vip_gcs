@@ -55,11 +55,8 @@ class Drone(object):
 
 		""" Status Flags """
 		self.activate = None
-		self.stream = None
 		self.battery = None
-		self.track = None
 		self.state = None
-		self.image = None
 
 		self.lastUpdate = None
 
@@ -71,11 +68,8 @@ class Drone(object):
 			'id': self.id,
 			'location': {'lat': self.lat, 'lng': self.lng, 'alt': self.alt},
 			'yaw': self.yaw,
-			'stream': self.stream,
 			'battery': self.battery,
-			'track': self.track,
 			'state': self.state,
-			'image': self.image,
 			'activate': self.activate,
 			'lastUpdate': self.lastUpdate,
 		}
@@ -132,10 +126,7 @@ class DroneClientThread(threading.Thread):
 		if data["type"] == "status":
 			
 			self.drone.activate = data["data"]["activate"]
-			self.drone.stream = data["data"]["stream"]
-			self.drone.track = data["data"]["track"]
 			self.drone.state = data["data"]["state"]
-			self.drone.image = data["data"]["image"]
 			self.drone.lastUpdate = data["data"]["lastUpdate"]
 
 			if data["data"]["activate"] == "on":
@@ -246,6 +237,7 @@ class GCSSeverThread(threading.Thread):
 		client.start()
 
 	def send(self, id_, msg):
+		msg = msg.encode() # Python3
 		for drone in self.droneList:
 			if drone.drone.id == id_:
 				drone.send(msg)
@@ -256,6 +248,7 @@ class GCSSeverThread(threading.Thread):
 				return drone
 
 	def send_to_all(self, msg):
+		msg = msg.encode() # Python3
 		for drone in self.droneList:
 			drone.send(msg)
 

@@ -141,7 +141,9 @@ class VipStatusLayout(QWidget):
 	def setStatus(self, info):
 
 		target = self._drone_by_id(info['id'])
-		target.setStatus(info)
+
+		if target:
+			target.setStatus(info)
 
 	def clicked_connect(self, id_, targetFunc):
 		target = self._drone_by_id(id_)
@@ -152,6 +154,8 @@ class VipStatusLayout(QWidget):
 		for droneStatus in self._droneStatusList:
 			if droneStatus.id == id_:
 				return droneStatus
+
+		return None
 
 # class VipSendToAll(QWidget):
 # 	def __init__(self, id_):
@@ -223,12 +227,10 @@ class VipDroneStatus(QWidget):
 				""")
 		text = """Drone %s
 		
-lat: %s
-lng: %s
-alt: %s
-yaw: %s
-battery: %s%%
-""" % (info['id'], info['location']['lat'], info['location']['lng'], info['location']['alt'], info['yaw'], info['battery'])
+lat: %.4f
+lng: %.4f
+alt: %.4f
+""" % (info['id'], float(info['location']['lat']), float(info['location']['lng']), float(info['location']['alt']))
 		
 		# text = "Drone %s" % info['id']
 		self.statusText.setText(text)
