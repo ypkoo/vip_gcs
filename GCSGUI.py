@@ -114,17 +114,20 @@ class MainFrame(QWidget):
 		self.takeoffBtn = VipCommandBtn("Take off")
 		self.startBtn = VipCommandBtn("Start")
 		self.landBtn = VipCommandBtn("Land")
+		self.goHomeBtn = VipCommandBtn("Go home")
 		self.resetBtn = VipCommandBtn("Reset")
 
 		self.cmdLayout.addWidget(self.takeoffBtn, 0, 0, 1, 1)
 		self.cmdLayout.addWidget(self.startBtn, 1, 0, 1, 1)
 		self.cmdLayout.addWidget(self.landBtn, 2, 0, 1, 1)
-		self.cmdLayout.addWidget(self.resetBtn, 3, 0, 1, 1)
+		self.cmdLayout.addWidget(self.goHomeBtn, 3, 0, 1, 1)
+		self.cmdLayout.addWidget(self.resetBtn, 4, 0, 1, 1)
 
 
 		self.takeoffBtn.clicked.connect(self.on_takeoffbtn_clicked)
 		self.startBtn.clicked.connect(self.on_startbtn_clicked)
 		self.landBtn.clicked.connect(self.on_landbtn_clicked)
+		self.goHomeBtn.clicked.connect(self.on_gohomebtn_clicked)
 		self.resetBtn.clicked.connect(self.on_resetbtn_clicked)
 
 
@@ -194,6 +197,17 @@ class MainFrame(QWidget):
 			self.server.send(self.context.curSelected, json.dumps(command))
 			self.logText.append(LOG("GUI", "Send land command to drone %s" % self.context.curSelected))
 
+	def on_gohomebtn_clicked(self):
+		command = {
+			"topic": "gcs",
+			"command": "goHome",
+		}
+		if self.context.curSelected == "0":
+			self.server.send_to_all(json.dumps(command))
+			self.logText.append(LOG("GUI", "Send goHome command to all drones"))
+		else:
+			self.server.send(self.context.curSelected, json.dumps(command))
+			self.logText.append(LOG("GUI", "Send goHome command to drone %s" % self.context.curSelected))
 
 	def on_resetbtn_clicked(self):
 		command = {
