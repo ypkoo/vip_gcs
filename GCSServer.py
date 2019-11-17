@@ -95,29 +95,31 @@ class DroneClientThread(threading.Thread):
 
 	def run(self):
 		while self.alive.isSet():
-			raw_data = self._socket.recv(2048)
-			if raw_data:
-				try:
-					data = json.loads(raw_data) # kokoga mondai
-				except Exception as e:
-					# print raw_data
-					# print type(e)
-					continue
-				if self.drone:
-					
-					self._update_drone(data)
-					
+			try:
+				raw_data = self._socket.recv(2048)
+				if raw_data:
+					try:
+						data = json.loads(raw_data) # kokoga mondai
+					except Exception as e:
+						# print raw_data
+						# print type(e)
+						continue
+					if self.drone:
+						
+						self._update_drone(data)
+						
+					else:
+						self.drone = Drone(data["data"]["id"])
+						self._update_drone(data)
+
+						# self._q.put(ClientReport(ClientReport.NEW, data["data"]["id"]))
+						self._q.put(ClientReport(ClientReport.NEW, self))
 				else:
-					
-
-					self.drone = Drone(data["data"]["id"])
-					self._update_drone(data)
-
-					# self._q.put(ClientReport(ClientReport.NEW, data["data"]["id"]))
-					self._q.put(ClientReport(ClientReport.NEW, self))
-			else:
-				# print "socket closed"
-				self.alive.clear()
+					# print "socket closed"
+					self.alive.clear()
+			except socket.error:
+				self._socket.close()
+				break
 
 		""" Terminate the thread """
 		self._terminate_thread()

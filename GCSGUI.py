@@ -112,22 +112,28 @@ class MainFrame(QWidget):
 		self.cmdWidget.setLayout(self.cmdLayout)
 		
 		self.takeoffBtn = VipCommandBtn("Take off")
-		self.startBtn = VipCommandBtn("Start")
+		self.moveBtn = VipCommandBtn("Move")
 		self.landBtn = VipCommandBtn("Land")
 		self.goHomeBtn = VipCommandBtn("Go home")
+		self.goForwardBtn = VipCommandBtn("Go Forward")
+		self.stopBtn = VipCommandBtn("Stop")
 		self.resetBtn = VipCommandBtn("Reset")
 
 		self.cmdLayout.addWidget(self.takeoffBtn, 0, 0, 1, 1)
-		self.cmdLayout.addWidget(self.startBtn, 1, 0, 1, 1)
+		self.cmdLayout.addWidget(self.moveBtn, 1, 0, 1, 1)
 		self.cmdLayout.addWidget(self.landBtn, 2, 0, 1, 1)
 		self.cmdLayout.addWidget(self.goHomeBtn, 3, 0, 1, 1)
-		self.cmdLayout.addWidget(self.resetBtn, 4, 0, 1, 1)
+		self.cmdLayout.addWidget(self.goForwardBtn, 4, 0, 1, 1)
+		self.cmdLayout.addWidget(self.stopBtn, 5, 0, 1, 1)
+		self.cmdLayout.addWidget(self.resetBtn, 6, 0, 1, 1)
 
 
 		self.takeoffBtn.clicked.connect(self.on_takeoffbtn_clicked)
-		self.startBtn.clicked.connect(self.on_startbtn_clicked)
+		self.moveBtn.clicked.connect(self.on_movebtn_clicked)
 		self.landBtn.clicked.connect(self.on_landbtn_clicked)
 		self.goHomeBtn.clicked.connect(self.on_gohomebtn_clicked)
+		self.goForwardBtn.clicked.connect(self.on_goforwardbtn_clicked)
+		self.stopBtn.clicked.connect(self.on_stopbtn_clicked)
 		self.resetBtn.clicked.connect(self.on_resetbtn_clicked)
 
 
@@ -172,18 +178,18 @@ class MainFrame(QWidget):
 			self.server.send(self.context.curSelected, json.dumps(command))
 			self.logText.append(LOG("GUI", "Send takeoff command to drone %s" % self.context.curSelected))
 
-	def on_startbtn_clicked(self):
+	def on_movebtn_clicked(self):
 		command = {
 			"topic": "gcs",
-			"command": "start",
+			"command": "move",
 		}
 		
 		if self.context.curSelected == "0":
 			self.server.send_to_all(json.dumps(command))
-			self.logText.append(LOG("GUI", "Send start command to all drones"))
+			self.logText.append(LOG("GUI", "Send move command to all drones"))
 		else:
 			self.server.send(self.context.curSelected, json.dumps(command))
-			self.logText.append(LOG("GUI", "Send start command to drone %s" % self.context.curSelected))
+			self.logText.append(LOG("GUI", "Send move command to drone %s" % self.context.curSelected))
 
 	def on_landbtn_clicked(self):
 		command = {
@@ -208,6 +214,30 @@ class MainFrame(QWidget):
 		else:
 			self.server.send(self.context.curSelected, json.dumps(command))
 			self.logText.append(LOG("GUI", "Send goHome command to drone %s" % self.context.curSelected))
+
+	def on_goforwardbtn_clicked(self):
+		command = {
+			"topic": "gcs",
+			"command": "goForward",
+		}
+		if self.context.curSelected == "0":
+			self.server.send_to_all(json.dumps(command))
+			self.logText.append(LOG("GUI", "Send goForward command to all drones"))
+		else:
+			self.server.send(self.context.curSelected, json.dumps(command))
+			self.logText.append(LOG("GUI", "Send goForward command to drone %s" % self.context.curSelected))
+
+	def on_stopbtn_clicked(self):
+		command = {
+			"topic": "gcs",
+			"command": "stop",
+		}
+		if self.context.curSelected == "0":
+			self.server.send_to_all(json.dumps(command))
+			self.logText.append(LOG("GUI", "Send stop command to all drones"))
+		else:
+			self.server.send(self.context.curSelected, json.dumps(command))
+			self.logText.append(LOG("GUI", "Send stop command to drone %s" % self.context.curSelected))
 
 	def on_resetbtn_clicked(self):
 		command = {
@@ -281,6 +311,7 @@ class MainFrame(QWidget):
 			info = drone.drone.get_info()
 
 			self.droneStatusLayout.setStatus(info)
+			print("[GCS GUI]", 'update_marker(%s, %s, %s)' % (info['id'], info['location']['lat'], info['location']['lng']))
 			self.gmap.page.runJavaScript('update_marker(%s, %s, %s)' % (info['id'], info['location']['lat'], info['location']['lng']))
 
 
