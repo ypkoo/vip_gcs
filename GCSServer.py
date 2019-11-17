@@ -105,7 +105,7 @@ class DroneClientThread(threading.Thread):
 						# print type(e)
 						continue
 					if self.drone:
-						
+						# print("[Drone client %s]" % self.drone.id, "update drone info", data)
 						self._update_drone(data)
 						
 					else:

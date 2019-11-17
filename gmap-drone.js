@@ -3,17 +3,9 @@ var gcsMarker;
 var drone_dict = {};
 var lineList = [];
 
-var groundGPS = {lat: 36.3695544, lng: 127.368479};
+var GCSLatLng = {lat: 36.3746243427586, lng: 127.36563397668647};
 var N1GPS = {lat: 36.374092, lng: 127.365638};
 var demo = {lat: 36.3697, lng: 127.3614};
-
-// var icons_url = {
-// 	'home': 'http://localhost:8000/map-icons/icon-gcs2-home.png',
-// 	'idle': 'http://localhost:8000/map-icons/icon-gcs2-blue.png',
-// 	'tracking' : 'http://localhost:8000/map-icons/icon-gcs2-green.png',
-// 	'red': 'http://localhost:8000/map-icons/icon-gcs2-red.png',
-// 	'yellow': 'http://localhost:8000/map-icons/icon-gcs2-blue.png'
-// }
 
 
 
@@ -47,7 +39,7 @@ function initMap() {
 
 	map.addListener('click', map_clicked);
 
-	//Locations of the GCS
+	// Locations of the GCS
 	// gcsMarker = new google.maps.Marker({
 	// 	position: GCSLatLng,
 	// 	map: map,
@@ -69,7 +61,6 @@ function map_clicked(e) {
 // updates the position of the marker
 // creates a new marker if the id is not recognized
 function update_marker(id, lat, lng) {
-	console.log("update marker!");
 
 	if (id in drone_dict && drone_dict[id] != null) {
 		var marker = drone_dict[id];
